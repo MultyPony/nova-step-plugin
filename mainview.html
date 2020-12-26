@@ -1,0 +1,170 @@
+<style>
+    .second-step, .third-step {
+        display: none;
+        /* visibility: hidden; */
+    }
+    
+    .show {
+        display: block;
+    }
+
+    fieldset {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-container {
+        display: flex;
+    }
+
+    .order-wrap {
+        width: 300px;
+        height: 500px;
+        
+        border: 1px solid black;
+        border-radius: 20px;
+    }
+</style>
+
+<div class="wrap">
+    <h1>Заказать уборку в три шага</h1>
+    <div class="form-container">
+        <form action="">
+            <div class="first-step">
+                <fieldset>
+                    <legend>Выберите тип уборки</legend>
+                    <label>
+                        Поддерживающая
+                        <input type="radio" name="clean-type" value="support" checked>
+                    </label>
+                    <label>
+                        Генеральная
+                        <input type="radio" name="clean-type" value="main">
+                    </label>
+                    <label>
+                        Послестроительная уборка
+                        <input type="radio" name="clean-type" value="main">
+                    </label>
+                </fieldset>
+                <fieldset>
+                    <legend>Где навести порядок?</legend>
+                    <label>
+                        Улица
+                        <input type="text" name="street">
+                    </label>
+                    <label>
+                        Дом
+                        <input type="text" name="house" placeholder="">
+                    </label>
+                    <label>
+                        Квартира
+                        <input type="number" name="apartment-number" value="1">
+                    </label>
+                    <label>
+                        Подьезд
+                        <input type="number" name="entrance" value="1">
+                    </label>
+                    <label>
+                        Этаж
+                        <input type="number" name="floor" value="1">
+                    </label>
+                </fieldset>
+                <fieldset>
+                    <legend>Во сколько приехать?</legend>
+                    <!-- Дата  и время -->
+                </fieldset>
+            </div>
+            <div class="second-step">
+                Дополнительные услуги
+                <fieldset>
+                    <legend></legend>
+                    <ul>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Чистка вытяжки
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Мытье шкафов изнутри  
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Замена постельного белья
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Мытье окон
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Чистка микроволновой печи
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Мытье духового шкафа изнутри 
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Мытье холодильника изнутри
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Доставка и забор ключей
+                            </label>
+                            <!-- <p>110р</p> -->
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox">
+                                Уборка на балконе
+                            </label>
+                        </li>
+                    </ul>
+                </fieldset>
+            </div>
+            <div class="third-step">
+                Расскажите о себе
+                <fieldset>
+                    <legend></legend>
+                    <label>
+                        Имя
+                        <input type="text" name="name">
+                    </label>
+                    <label>
+                        Телефон
+                        <input type="text" name="name">
+                    </label>
+                    <label>
+                        Почта
+                        <input type="email" name="email">
+                    </label>
+                </fieldset>
+            </div>
+        </form>
+        <div class="order-wrap"> 
+            <p class="clean-type-heading"></p>
+            <label>
+                Площадь помещения, м2
+                <input type="number" name="square" value="10">
+            </label>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
