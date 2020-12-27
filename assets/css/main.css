@@ -1,11 +1,21 @@
 .clean-type-wrap {
     display: flex;
+    margin: 15px 0;
 }
 
 .clean-type-label {
     box-sizing: border-box;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
     padding: 10px;
+
+    /* font-family: ; */
+    font-size: 15px;
+    color: white;
+    /* color: #c0bdbd; */
 
     background-color: #14caf4;
     /* border: 1px solid black; */
@@ -15,7 +25,8 @@
 }
 
 .clean-type-label:hover {
-    background-color: #045ba8;
+    /* background-color: #045ba8; */
+    box-shadow: 0px 0px 8px 3px #045ba8;
 }
 
 .clean-type-label:nth-child(2) {
@@ -25,6 +36,7 @@
 
 .clean-type-label__checked {
     background-color: #045ba8;
+    /* box-shadow: 10px 5px 5px red; */
 }
 
 .clean-type-label input[type="radio"] {
@@ -32,8 +44,10 @@
 }
 
 .clean-type-price {
-    font-size: 20px;
-    color: black;
+    margin: 0;
+
+    font-size: 18px;
+    /* color: black; */
 }
 
 .legend {

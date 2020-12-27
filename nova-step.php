@@ -52,7 +52,7 @@ function wporg_settings_field_callback() {
     // output the field
     ?>
     <!-- <input type="number" name="novastep_setting_name" value="<?php echo isset( $setting['support_clean'] ) ? esc_attr( $setting ) : ''; ?>"> -->
-    <input type="number" name="novastep_setting_name[support_clean]" value="<?php echo $setting['support_clean']?>">
+    <input type="number" name="novastep_setting_name[support_clean]" value="<?php echo $setting['support_clean']?>"> ₽
     <?php
 }
 
@@ -61,7 +61,7 @@ function wporg_settings_field_callback2() {
     $setting = get_option('novastep_setting_name');
     // output the field
     ?>
-    <input type="number" name="novastep_setting_name[main_clean]" value="<?php echo $setting['main_clean'] ?>">
+    <input type="number" name="novastep_setting_name[main_clean]" value="<?php echo $setting['main_clean'] ?>"> ₽
     <?php
 }
 
@@ -70,7 +70,7 @@ function wporg_settings_field_callback3() {
     $setting = get_option('novastep_setting_name');
     // output the field
     ?>
-    <input type="number" name="novastep_setting_name[post-construction_clean]" value="<?php echo $setting['post-construction_clean'] ?>">
+    <input type="number" name="novastep_setting_name[post-construction_clean]" value="<?php echo $setting['post-construction_clean'] ?>"> ₽
     <?php
 }
 

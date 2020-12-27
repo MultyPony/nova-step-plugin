@@ -21,13 +21,11 @@
                             </p>
                         </label>
                         <label class="clean-type-label">
+                            Послестроительная уборка
                             <input type="radio" name="clean-type" value="build">
-                            <div class="abs">
-                                <p>Послестроительная уборка</p>
-                                <p class="clean-type-price">
+                            <p class="clean-type-price">
                                     <?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?> ₽
-                                </p>
-                            </div>
+                            </p>
                         </label>
                     </div>
                 </fieldset>
@@ -57,6 +55,8 @@
                 <fieldset>
                     <legend class="legend">Во сколько приехать?</legend>
                     <!-- Дата  и время -->
+                    <input type="date" required>
+                    <input type="time" min="09:00" max="18:00" step="1800" required>
                 </fieldset>
             </div>
             <div class="second-step">
