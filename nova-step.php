@@ -106,26 +106,32 @@ function nova_step_show_content() {
 // }
 
 
-// Регистрация скриптов и стилей
-function nova_step_register_assets() {
+// Регистрация скриптов и стилей (админ)
+function nova_step_register_admin_assets() {
     wp_register_style('nova_step_admin-styles', plugins_url('assets/css/admin.css', __FILE__));
-    wp_register_script('nova_step_scripts', plugins_url('assets/js/admin.js', __FILE__));
+    wp_register_script('nova_step_scripts', plugins_url('assets/js/admin.js', __FILE__), array('jquery'), null, true);
 }
-add_action('admin_enqueue_scripts', 'nova_step_register_assets');
+add_action('admin_enqueue_scripts', 'nova_step_register_admin_assets');
 
-// Подключение скриптов и стилей
+// Подключение скриптов и стилей (админ)
 
 function nova_step_load_assets($hook) {
     if($hook != 'toplevel_page_novastep') {
             return;
-        }
+    }
     wp_enqueue_style('nova_step_admin-styles');
     wp_enqueue_script('nova_step_scripts');
 }
 add_action('admin_enqueue_scripts', 'nova_step_load_assets');
 
+// Регистрация скриптов и стилей 
 
-
+add_action('wp_enqueue_scripts', 'callback_for_setting_up_scripts');
+function callback_for_setting_up_scripts() {
+    wp_register_style( 'namespace', plugins_url('assets/css/main.css', __FILE__));
+    wp_enqueue_style( 'namespace' );
+    wp_enqueue_script( 'namespaceformyscript', plugins_url('/assets/js/main.js', __FILE__), array( 'jquery' ));
+}
 
 
 

@@ -1,65 +1,41 @@
-<style>
-    .second-step, .third-step {
-        /* display: none; */
-        /* visibility: hidden; */
-    }
-    
-    .show {
-        display: block;
-    }
-
-    fieldset {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .form-container {
-        display: flex;
-    }
-
-    .order-wrap {
-        width: 300px;
-        height: 500px;
-        
-        border: 1px solid black;
-        border-radius: 20px;
-    }
-</style>
-
 <div class="wrap">
     <h1>Заказать уборку в три шага</h1>
     <div class="form-container">
         <form action="" method="post">
             <div class="first-step">
                 <fieldset>
-                    <legend>Выберите тип уборки</legend>
-                    <label>
-                        Поддерживающая 
-                        <input type="radio" name="clean-type" value="support" checked>
-                        <p class="clean-type-price">
-                            <?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?>
-                        </p>
-                    </label>
-                    <label>
-                        Генеральная
-                        <input type="radio" name="clean-type" value="main">
-                        <p class="clean-type-price">
-                            <?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?>
-                        </p>
-                    </label>
-                    <label>
-                        Послестроительная уборка
-                        <input type="radio" name="clean-type" value="build">
-                        <p class="clean-type-price">
-                            <?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?>
-                        </p>
-                    </label>
+                    <legend class="legend">Выберите тип уборки</legend>
+                    <div class="clean-type-wrap">
+                        <label class="clean-type-label clean-type-label__checked">
+                            Поддерживающая 
+                            <input type="radio" name="clean-type" value="support" checked>
+                            <p class="clean-type-price">
+                                <?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?> ₽
+                            </p>
+                        </label>
+                        <label class="clean-type-label">
+                            Генеральная
+                            <input type="radio" name="clean-type" value="main">
+                            <p class="clean-type-price">
+                                <?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?> ₽
+                            </p>
+                        </label>
+                        <label class="clean-type-label">
+                            <input type="radio" name="clean-type" value="build">
+                            <div class="abs">
+                                <p>Послестроительная уборка</p>
+                                <p class="clean-type-price">
+                                    <?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?> ₽
+                                </p>
+                            </div>
+                        </label>
+                    </div>
                 </fieldset>
                 <fieldset>
-                    <legend>Где навести порядок?</legend>
+                    <legend class="legend">Где навести порядок?</legend>
                     <label>
                         Улица
-                        <input type="text" name="street">
+                        <input id="address" name="address" type="text" />
                     </label>
                     <label>
                         Дом
@@ -79,7 +55,7 @@
                     </label>
                 </fieldset>
                 <fieldset>
-                    <legend>Во сколько приехать?</legend>
+                    <legend class="legend">Во сколько приехать?</legend>
                     <!-- Дата  и время -->
                 </fieldset>
             </div>
@@ -167,16 +143,42 @@
             <button type="submit">Заказать</button>
         </form>
         <div class="order-wrap"> 
-            <p class="clean-type-heading"></p>
+            <p class="clean-type-heading-order">Тип уборки</p>
+            <p>Адрес:</p>
+            <p>-</p>
+            <p>Дата и время:</p>
+            <p>-</p>
             <label>
                 Площадь помещения, м2
                 <input type="number" name="square" value="10">
             </label>
+            <p>Доп. услуги:</p>
+            <p>-</p>
+            <p>Стоимость уборки:</p>
         </div>
     </div>
 </div>
-<script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/css/suggestions.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/js/jquery.suggestions.min.js"></script>
 
+<script>
+    $("#address").suggestions({
+        token: "31eaf903a7b8a04154ad9ddb5e7376667580fd3a",
+        type: "ADDRESS",
+        constraints: {
+            // ограничиваем поиск Москвой
+            "locations": [{
+            "kladr_id": "70"
+            }]
+        },
+        // в списке подсказок не показываем область
+        // restrict_value: true
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            console.log(suggestion);
+        }
+    });
 </script>
 
 <?php
