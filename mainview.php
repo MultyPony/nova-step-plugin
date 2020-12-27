@@ -1,7 +1,7 @@
 <div class="wrap">
-    <h1>Заказать уборку в три шага</h1>
+    <h1 class="ns_main-heading">Заказать уборку в три шага</h1>
     <div class="form-container">
-        <form action="" method="post">
+        <form class="main-form" action="" method="post">
             <div class="first-step">
                 <fieldset>
                     <legend class="legend">Выберите тип уборки</legend>
@@ -31,36 +31,45 @@
                 </fieldset>
                 <fieldset>
                     <legend class="legend">Где навести порядок?</legend>
-                    <label>
-                        Улица
-                        <input id="address" name="address" type="text" />
-                    </label>
-                    <label>
-                        Дом
-                        <input type="text" name="house" placeholder="">
-                    </label>
-                    <label>
-                        Квартира
-                        <input type="number" name="apartment-number" value="1">
-                    </label>
-                    <label>
-                        Подьезд
-                        <input type="number" name="entrance" value="1">
-                    </label>
-                    <label>
-                        Этаж
-                        <input type="number" name="floor" value="1">
-                    </label>
+                    <div class="address_1">
+                        <label>
+                            Улица
+                            <input class="ns_address" id="address" name="address" type="text" />
+                        </label>
+                        <label class="house">
+                            Дом
+                            <input class="ns_house" type="text" name="house" placeholder="">
+                        </label>
+                    </div>
+                    <div class="address_2">
+                        <label class="apartment">
+                            Квартира
+                            <input class="ns_apartment" type="number" name="apartment-number">
+                        </label>
+                        <label  class="entrance">
+                            Подьезд
+                            <input class="entrance-input" type="number" name="entrance">
+                        </label>
+                        <label class="floor">
+                            Этаж
+                            <input class="floor-input" type="number" name="floor">
+                        </label>
+                    </div>
                 </fieldset>
                 <fieldset>
                     <legend class="legend">Во сколько приехать?</legend>
-                    <!-- Дата  и время -->
-                    <input type="date" required>
-                    <input type="time" min="09:00" max="18:00" step="1800" required>
+                    <div class="date-time">
+                        <label class="ns_date">
+                            <input class="date-input" type="date" required name="ns_date">
+                        </label>
+                        <label class="ns_time">
+                            <input class="ns_time__input" type="time" min="09:00" max="18:00" step="1800" required name="ns_time">
+                        </label>
+                    </div>
                 </fieldset>
             </div>
-            <div class="second-step">
-                Дополнительные услуги
+            <div class="second-step hidden">
+                <!-- Дополнительные услуги -->
                 <fieldset>
                     <legend></legend>
                     <ul>
@@ -122,25 +131,25 @@
                     </ul>
                 </fieldset>
             </div>
-            <div class="third-step">
-                Расскажите о себе
+            <div class="third-step hidden">
+                <!-- Расскажите о себе -->
                 <fieldset>
                     <legend></legend>
                     <label>
                         Имя
-                        <input type="text" name="ns_name">
+                        <input class="ns_name" type="text" name="ns_name">
                     </label>
                     <label>
                         Телефон
-                        <input type="text" name="ns_tel">
+                        <input class="ns_tel" type="text" name="ns_tel">
                     </label>
                     <label>
                         Почта
-                        <input type="email" name="ns_email">
+                        <input class="ns_email" type="email" name="ns_email">
                     </label>
                 </fieldset>
             </div>
-            <button type="submit">Заказать</button>
+            <button type="submit" hidden>Заказать</button>
         </form>
         <div class="order-wrap"> 
             <p class="clean-type-heading-order">Тип уборки</p>
@@ -155,6 +164,7 @@
             <p>Доп. услуги:</p>
             <p>-</p>
             <p>Стоимость уборки:</p>
+            <button class="next-btn" type="button">Далее</button>
         </div>
     </div>
 </div>
@@ -166,15 +176,13 @@
     $("#address").suggestions({
         token: "31eaf903a7b8a04154ad9ddb5e7376667580fd3a",
         type: "ADDRESS",
+        bounds: "street",
         constraints: {
-            // ограничиваем поиск Москвой
+            // ограничиваем поиск по Томску
             "locations": [{
             "kladr_id": "70"
-            }]
+            }],
         },
-        // в списке подсказок не показываем область
-        // restrict_value: true
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
         onSelect: function(suggestion) {
             console.log(suggestion);
         }
@@ -185,10 +193,7 @@
     $service_list = "";
     if(!empty($_POST['services'])) {
         foreach($_POST['services'] as $service) {
-            // $service_list .= "- " . (empty($service) ? "PUSTO" : $service) . "\n"; //echoes the value set in the HTML form for each checked checkbox.
-            $service_list .= "- " . $service . "\n"; //echoes the value set in the HTML form for each checked checkbox.
-                            //so, if I were to check 1, 3, and 5 it would echo value 1, value 3, value 5.
-                            //in your case, it would echo whatever $row['Report ID'] is equivalent to.
+            $service_list .= "- " . $service . "\n"; 
         }
     }
 
@@ -196,7 +201,7 @@
         $message = 'Тип уборки: ' . $_POST['clean-type'] . "\n";
         $message .= "Дополнительные услуги\n";
         $message .= $service_list;
-        $message .= "";
+        $message .= "Когда: " . $_POST['ns_date'] . " " . $_POST['ns_time'] . "\n";
         $message .= "Адрес: ул. " . $_POST['street'] . ", д. " . $_POST['house'] ;
         $message .= ", кв. " . $_POST['apartment-number'] . "\n";
         $message .= 'Подъезд №: ' . $_POST['entrance'] . "\n";
