@@ -1,5 +1,9 @@
 
 document.addEventListener("DOMContentLoaded", function() {
+    IMask(document.querySelector('.ns_tel'), {
+        mask: '+{7}(000)000-00-00'
+    });
+
     let t_address = tippy('.ns_address', {
         content: 'Введите название улицы',
         placement: 'bottom',
@@ -56,6 +60,24 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     t_time[0].disable();
 
+    let t_name = tippy('.ns_name', {
+        content: 'Введите свое имя',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_name[0].disable();
+    
+    
+    let t_tel = tippy('.ns_tel', {
+        content: 'Введите свой номер телефона',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_tel[0].disable();
+
+
 
     // Тип уборки
     let wrap = document.querySelector(".clean-type-wrap");
@@ -104,11 +126,15 @@ document.addEventListener("DOMContentLoaded", function() {
         // ВСЕ АЛЕРТЫ ЗАМЕНИТЬ НА ТУЛТИПЫ 
         if(nextBtn.classList.contains ('end')) {
             if(nameInput.value === "") {
-                alert("Вы не ввели своё имя.");
+                t_name[0].enable();
+                t_name[0].show();
+                // alert("Вы не ввели своё имя.");
                 return;
             }
             if(telInput.value === "") {
-                alert("Вы не ввели свой телефон.");
+                t_tel[0].enable();
+                t_tel[0].show();
+                // alert("Вы не ввели свой телефон.");
                 return;
             }
             form.submit();
