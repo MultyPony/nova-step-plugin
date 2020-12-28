@@ -1,4 +1,61 @@
+
 document.addEventListener("DOMContentLoaded", function() {
+    let t_address = tippy('.ns_address', {
+        content: 'Введите название улицы',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_address[0].disable();
+
+    let t_house = tippy('.ns_house', {
+        content: 'Введите номер дома',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_house[0].disable();
+
+    let t_apartment = tippy('.ns_apartment', {
+        content: 'Введите номер квартиры',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_apartment[0].disable();
+
+    let t_entrance = tippy('.entrance-input', {
+        content: 'Введите номер подъезда',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_entrance[0].disable();
+
+    let t_floor = tippy('.floor-input', {
+        content: 'Введите этаж',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_floor[0].disable();
+
+    let t_date = tippy('.date-input', {
+        content: 'Выберите дату',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_date[0].disable();
+    
+    let t_time = tippy('.ns_time__input', {
+        content: 'Выберите время',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_time[0].disable();
+
 
     // Тип уборки
     let wrap = document.querySelector(".clean-type-wrap");
@@ -70,31 +127,45 @@ document.addEventListener("DOMContentLoaded", function() {
                 return;
             }
             if(streetInput.value === "") {
-                alert("Вы не ввели улицу.");
+                t_address[0].enable();
+                t_address[0].show();
+                // alert("Вы не ввели улицу.");
                 return;
             }
             if(houseInput.value === "") {
-                alert("Вы не ввели номер дома.");
+                t_house[0].enable();
+                t_house[0].show();
+                // alert("Вы не ввели номер дома.");
                 return;
             }
             if(apartmentInput.value === "") {
-                alert("Вы не ввели номер квартиры.");
+                t_apartment[0].enable();
+                t_apartment[0].show();
+                // alert("Вы не ввели номер квартиры.");
                 return;
             }
             if(entranceInput.value === "") {
-                alert("Вы не ввели номер подъезда.");
+                t_entrance[0].enable();
+                t_entrance[0].show();
+                // alert("Вы не ввели номер подъезда.");
                 return;
             }
             if(floorInput.value === "") {
-                alert("Вы не ввели этаж.");
+                t_floor[0].enable();
+                t_floor[0].show();
+                // alert("Вы не ввели этаж.");
                 return;
             }
             if(dateInput.value === "") {
-                alert("Вы не ввели дату.");
+                t_date[0].enable();
+                t_date[0].show();
+                // alert("Вы не ввели дату.");
                 return;
             }
             if(timeInput.value === "") {
-                alert("Вы не ввели время.");
+                t_time[0].enable();
+                t_time[0].show();
+                // alert("Вы не ввели время.");
                 return;
             }
             // На этом этапе все проверки 1-го шага пройдены можно переходить к следующему шагу
@@ -106,5 +177,30 @@ document.addEventListener("DOMContentLoaded", function() {
             nextBtn.classList.add('dop-uslugi');
         }      
     });
+
+    // Доп услуги
+    let list = document.querySelector(".service-list");
+    list.addEventListener("click", function(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        let closestItem = evt.target.closest(".service-item")
+
+        if(closestItem !== null) {
+            closestItem.classList.toggle('service-item__checked');
+            let checkBox = closestItem.querySelector('.service-checkbox');
+            if(checkBox.checked) {
+                checkBox.checked = false;
+            }
+            else {
+                checkBox.checked = true;
+            }
+            console.log('checkbox ' + checkBox.checked);
+        }
+        
+    });
+
+
+    
 
 });
