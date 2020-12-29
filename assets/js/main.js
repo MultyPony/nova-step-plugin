@@ -77,6 +77,14 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     t_tel[0].disable();
 
+    let t_inputDisplay = tippy('.input-num__display', {
+        content: 'Введите положительное число',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_inputDisplay[0].disable();
+
 
 
     // Тип уборки
@@ -205,7 +213,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Доп услуги
+    let orderServiceList = document.querySelector('.order-service');
     let list = document.querySelector(".service-list");
+
     list.addEventListener("click", function(evt) {
         evt.stopPropagation();
         evt.preventDefault();
@@ -217,16 +227,158 @@ document.addEventListener("DOMContentLoaded", function() {
             let checkBox = closestItem.querySelector('.service-checkbox');
             if(checkBox.checked) {
                 checkBox.checked = false;
+                var li = orderServiceList.querySelector(`[data-index="${checkBox.value}"]`);
+                if(null != li)
+                    orderServiceList.removeChild(li);
             }
             else {
                 checkBox.checked = true;
+                // orderServiceList.appendChild(document.createElement("li").textContent = closestItem.querySelector('.service-name').textContent);
+                var li = document.createElement("li");
+                li.setAttribute('class', 'order-service-item');
+                li.setAttribute('data-index', checkBox.value);
+                li.appendChild(document.createTextNode(closestItem.querySelector('.service-name').textContent));
+                orderServiceList.appendChild(li);
+                // orderServiceList.textContent = closestItem.querySelector('.service-name').textContent
+                
             }
             console.log('checkbox ' + checkBox.checked);
         }
         
     });
 
+    function getCheckedValueCheckbox( groupName ) {
+        let radios = document.getElementsByName( groupName );
+        for( i = 0; i < radios.length; i++ ) {
+            if( radios[i].checked ) {
+                return radios[i].value;
+            }
+        }
+        return null;
+    }
+
+
+    // Кв метры
+
+    let sqMetersInput = document.getElementById('square-meters');
+    let sqDup = document.getElementById('sqm-dup');
+    let sqDupWrap = document.querySelector('.input-num');
+
+    sqDup.addEventListener('change', function() {
+        if(sqDup.value <= 0) {
+            sqDup.value = 1;
+            t_inputDisplay[0].enable();
+            t_inputDisplay[0].show();
+        }
+        else {
+            sqMetersInput.value = sqDup.value;
+        }
+        console.log('MAIN_VALUE-1: ' + sqDup.value);
+    });
+
+    sqDupWrap.addEventListener('click', function(evt) {
+        if(evt.target.id === 'square-min-btn') {
+            if(sqDup.value <= 1) return;
+            sqDup.value = +sqDup.value - 1;
+            sqMetersInput.value = sqDup.value;
+        }
+        else if (evt.target.id === 'square-plus-btn') {
+            sqDup.value = +sqDup.value + 1;
+            sqMetersInput.value = sqDup.value;
+        }
+        console.log('MAIN_VALUE-2: ' + sqDup.value);
+    });
+
+    // SIDEBAR
+
+    // Тип уборки 
+    let typeOrder = document.querySelector('.order-type');
+    let cleanTypeList = document.getElementsByName('clean-type');
+
+    cleanTypeList.forEach(el => {
+        el.addEventListener('change', function(evt) {
+            // console.log(evt.target);
+            // evt.target.parentNode.querySelector('.clean-title').textContent
+            // console.log(evt.target.parentNode.querySelector('.clean-title').textContent);
+            
+            if (evt.target.checked) {
+                typeOrder.textContent = evt.target.parentNode.querySelector('.clean-title').textContent;
+            }
+        })
+    });
+
+    // Адрес
+
+    let orderAddr = document.querySelector('.order-address');
+    
+    let streetStr = '';
+    let houseStr = '';
+    let apartmentStr = '';
+    let addressResult = '';
+
+    streetInput.addEventListener('change', function(evt) {
+        // console.log(evt.target.value);
+        streetStr = evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+        // if(evt.target.value != "")
+    });
+    streetInput.addEventListener('focusout', function(evt) {
+        streetStr = evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+    });
+
+
+    houseInput.addEventListener('change', function(evt) {
+        // console.log(evt.target.value);
+        houseStr = evt.target.value == '' ? '' : ', ' + evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+        // if(evt.target.value != "")
+    });
+    houseInput.addEventListener('mouseleave', function(evt) {
+        houseStr = evt.target.value == '' ? '' : ', ' + evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+    });
+
+
+    apartmentInput.addEventListener('change', function(evt) {
+        // console.log(evt.target.value);
+        apartmentStr = evt.target.value == '' ? '' : ', кв. ' + evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+        // if(evt.target.value != "")
+    });
+    apartmentInput.addEventListener('mouseleave', function(evt) {
+        apartmentStr = evt.target.value == '' ? '' : ', кв. ' + evt.target.value;
+        addressResult = streetStr + houseStr + apartmentStr;
+        orderAddr.textContent = addressResult; 
+    });
+    
+    // Дата и время
+
+    // let dateInput =  document.querySelector(".date-input");
+    let orderDate = document.querySelector('.order-date');
+    let dateStr = '';
+    let timeStr = '';
+    let dateAndTime = '';
+
+    dateInput.addEventListener('change', function(evt){
+        let date = new Date(evt.target.value);
+        
+        dateStr = date.getDate();
+        dateStr += '.' + date.getMonth();
+        dateStr += '.' + date.getFullYear();
+        dateAndTime = dateStr + ' ' + timeStr;
+        orderDate.textContent = dateAndTime;
+    });
+    timeInput.addEventListener('change', function(evt){
+        timeStr = evt.target.value;
+        dateAndTime = dateStr + ' ' + timeStr;
+        orderDate.textContent = dateAndTime;
+    });
 
     
-
 });
