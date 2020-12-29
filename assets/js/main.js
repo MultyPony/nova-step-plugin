@@ -1,5 +1,5 @@
-
 document.addEventListener("DOMContentLoaded", function() {
+
     IMask(document.querySelector('.ns_tel'), {
         mask: '+{7}(000)000-00-00'
     });
@@ -86,6 +86,28 @@ document.addEventListener("DOMContentLoaded", function() {
     t_inputDisplay[0].disable();
 
 
+    // Цена
+    function getCheckedPrice( groupName ) {
+        let radios = document.getElementsByName( groupName );
+        for( i = 0; i < radios.length; i++ ) {
+            if( radios[i].checked ) {
+                return radios[i].dataset.price;
+            }
+        }
+        return null;
+    }
+    let sqMetersInput = document.getElementById('square-meters');
+    const sqPrice = sqMetersInput.dataset.sqPrice;
+    let orderPrice = document.querySelector('.order-price');
+    let totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type'); // sqPrice * k + t + S;
+
+    orderPrice.textContent = totalPrice + ' ₽';
+
+    function recalculateTotal() {
+        // ДОБАВИТЬ ДОП. УСЛУГИ
+        totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type');
+        orderPrice.textContent = totalPrice + ' ₽';
+    }
 
     // Тип уборки
     let wrap = document.querySelector(".clean-type-wrap");
@@ -97,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (element.nodeName == 'LABEL' && element.nodeName == evt.target.parentNode.nodeName) {
                 evt.target.parentNode.classList.add('clean-type-label__checked');
             }
+            recalculateTotal();
         });
     });
 
@@ -260,13 +283,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Кв метры
 
-    let sqMetersInput = document.getElementById('square-meters');
     let sqDup = document.getElementById('sqm-dup');
     let sqDupWrap = document.querySelector('.input-num');
 
     sqDup.addEventListener('change', function() {
         if(sqDup.value <= 0) {
             sqDup.value = 1;
+            sqMetersInput.value = sqDup.value;
             t_inputDisplay[0].enable();
             t_inputDisplay[0].show();
         }
@@ -275,6 +298,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         console.log('MAIN_VALUE-1: ' + sqDup.value);
     });
+    sqDup.addEventListener('focusout', recalculateTotal);
+    sqDup.addEventListener('input', recalculateTotal);
 
     sqDupWrap.addEventListener('click', function(evt) {
         if(evt.target.id === 'square-min-btn') {
@@ -286,8 +311,10 @@ document.addEventListener("DOMContentLoaded", function() {
             sqDup.value = +sqDup.value + 1;
             sqMetersInput.value = sqDup.value;
         }
+        recalculateTotal();
         console.log('MAIN_VALUE-2: ' + sqDup.value);
     });
+    
 
     // SIDEBAR
 
@@ -379,6 +406,18 @@ document.addEventListener("DOMContentLoaded", function() {
         dateAndTime = dateStr + ' ' + timeStr;
         orderDate.textContent = dateAndTime;
     });
+    timeInput.addEventListener('input', function(evt){
+        timeStr = evt.target.value;
+        dateAndTime = dateStr + ' ' + timeStr;
+        orderDate.textContent = dateAndTime;
+    });
 
     
+
+
+
+
+    
+
+
 });
