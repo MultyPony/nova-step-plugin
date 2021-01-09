@@ -1,4 +1,10 @@
+const OPENING_HOUR = 9;
+const CLOSING_HOUR = 21;
+
 document.addEventListener("DOMContentLoaded", function() {
+// window.addEventListener("load", function() {
+    document.getElementById('Footer').remove();
+
 
     IMask(document.querySelector('.ns_tel'), {
         mask: '+{7}(000)000-00-00'
@@ -52,8 +58,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     t_date[0].disable();
     
-    let t_time = tippy('.ns_time__input', {
-        content: 'Выберите время',
+    let t_time = tippy('.ns_time', {
+        content: 'Выберите время между 9:00 и 18:00',
         placement: 'bottom',
         theme: 'tomato',
         trigger: 'manual',
@@ -97,16 +103,23 @@ document.addEventListener("DOMContentLoaded", function() {
         return null;
     }
     let sqMetersInput = document.getElementById('square-meters');
+    let totalPriceInput = document.getElementById('total-price');
     const sqPrice = sqMetersInput.dataset.sqPrice;
     let orderPrice = document.querySelector('.order-price');
+    let orderPriceBottom = document.querySelector('.order-bottom .order-price');
+    let sumOfAddServices = 0;
     let totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type'); // sqPrice * k + t + S;
 
     orderPrice.textContent = totalPrice + ' ₽';
+    orderPriceBottom.textContent = totalPrice + ' ₽';
+    totalPriceInput.value = +totalPrice;
 
     function recalculateTotal() {
         // ДОБАВИТЬ ДОП. УСЛУГИ
-        totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type');
+        totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type') + +sumOfAddServices;
+        totalPriceInput.value = +totalPrice;
         orderPrice.textContent = totalPrice + ' ₽';
+        orderPriceBottom.textContent = totalPrice + ' ₽';
     }
 
     // Тип уборки
@@ -114,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
     wrap.addEventListener("click", function(evt) {
         let ch = Array.from(wrap.children);
         ch.forEach(element => {
-            if(element.nodeName == 'LABEL' && element != evt.target.parentNode) {
+            if(element.nodeName == 'LABEL' && !evt.target.classList.contains('clean-type-wrap') && element != evt.target.parentNode) {
                 element.classList.remove('clean-type-label__checked');
             } else if (element.nodeName == 'LABEL' && element.nodeName == evt.target.parentNode.nodeName) {
                 evt.target.parentNode.classList.add('clean-type-label__checked');
@@ -153,31 +166,114 @@ document.addEventListener("DOMContentLoaded", function() {
     let form = document.querySelector('.main-form');
 
     let nextBtn = document.querySelector(".next-btn");
-    nextBtn.addEventListener("click", function(evt) {
-        // ВСЕ АЛЕРТЫ ЗАМЕНИТЬ НА ТУЛТИПЫ 
-        if(nextBtn.classList.contains ('end')) {
+    let nextBtnBottom = document.querySelector(".order-bottom .next-btn");
+    let prevBtn = document.querySelector(".order-wrap .prev-btn");
+    let prevBtnBottom = document.querySelector(".order-bottom .prev-btn");
+    let numWrap = document.querySelector('.num-wrap');
+    let activeStep = 0;
+
+
+    // dateInput.datepicker();
+    let curDate = new Date();
+
+    function dateToString(date) {
+        let day = date.getDate().toString.length == 1 ? '0' + date.getDate() : date.getDate();
+        let month = date.getMonth().toString.length == 1 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+        let year = date.getFullYear();
+        return (day + '.' + month + '.' + year);
+    }
+
+    $('.date-input').datepicker({
+        onHide: function(inst, animationCompleted) {
+            if(animationCompleted) {
+                console.log("YEAHHH BEATCHHH!!");
+                console.log(inst.el.value);
+                let year = inst.el.value.substring(6,10);
+                let month = inst.el.value.substring(3,5);
+                let day = inst.el.value.substring(0,2);
+                console.log('DATE: ' + +year);
+                
+                if (day == '' || month == '' || year == '')
+                    dateStr = '';
+                else
+                    dateStr = day + '.' + month + '.' + year;
+                dateAndTime = dateStr + ' ' + timeStr;
+                orderDate.textContent = dateAndTime;
+            }
+        },
+        onSelect: function(formattedDate, date, inst) {
+            console.log("YEAHHH BEATCHHH!!");
+            console.log(formattedDate);
+            let year = inst.el.value.substring(6,10);
+            let month = inst.el.value.substring(3,5);
+            let day = inst.el.value.substring(0,2);
+            console.log('DATE: ' + +year);
+            
+            if (day == '' || month == '' || year == '')
+                dateStr = '';
+            else
+                dateStr = day + '.' + month + '.' + year;
+            dateAndTime = dateStr + ' ' + timeStr;
+            orderDate.textContent = dateAndTime;
+            
+        },
+        onRenderCell: function (date, cellType) {
+            // var dateR = new Date();
+            // let day = curDate.getDate().toString.length == 1 ? '0' + curDate.getDate() : curDate.getDate();
+            // let month = curDate.getMonth().toString.length == 1 ? '0' + (curDate.getMonth() + 1) : curDate.getMonth() + 1;
+            // let year = curDate.getFullYear();
+            // let curD = day + '.' + month + '.' + year;
+
+            // console.log(dateToString(curDate));
+            if (cellType == 'day' && dateToString(curDate) === dateToString(date)) {
+                return {
+                    disabled: false
+                }
+            }
+            // let cellDay = date.getTime();
+            if (cellType == 'day' && date.getTime() < curDate.getTime()) {    
+                return {
+                    disabled: true
+                }
+            }
+        }
+    }
+    );
+
+    nextBtn.addEventListener("click", nextButtonClick);
+    nextBtnBottom.addEventListener("click", nextButtonClick);
+    prevBtn.addEventListener("click", prevButtonClick);
+    prevBtnBottom.addEventListener("click", prevButtonClick);
+
+    function nextButtonClick(evt) {
+        if(evt.target.classList.contains ('end')) {
             if(nameInput.value === "") {
                 t_name[0].enable();
                 t_name[0].show();
-                // alert("Вы не ввели своё имя.");
                 return;
             }
-            if(telInput.value === "") {
+            if(telInput.value === "" || telInput.value.length < 16) {
                 t_tel[0].enable();
                 t_tel[0].show();
-                // alert("Вы не ввели свой телефон.");
                 return;
             }
             form.submit();
 
-        } else if(nextBtn.classList.contains ('dop-uslugi')) {
-            nextBtn.classList.remove('dop-uslugi');
-            nextBtn.classList.add('end');
-            nextBtn.innerHTML = 'Заказать';
+        } else if(evt.target.classList.contains ('dop-uslugi')) {
+            // evt.target.classList.remove('dop-uslugi');
+            // evt.target.classList.add('end');
+            // prevBtn.classList.remove('dop-uslugi');
+            // prevBtn.classList.add('end');
+            // prevBtnBottom.classList.remove('dop-uslugi');
+            // prevBtnBottom.classList.add('end');
+            // evt.target.innerHTML = 'Заказать';
 
-            mainHeading.innerHTML = 'Расскажите о себе';
-            secondStep.classList.add('hidden');
-            thirdStep.classList.remove('hidden');
+            // mainHeading.innerHTML = 'Расскажите о себе';
+            // secondStep.classList.add('hidden');
+            // thirdStep.classList.remove('hidden');
+
+            changeActiveStep(3);
+            changeActiveNum(3);
         } else {
             if(getCheckedValue('clean-type') === null) {
                 alert("Вы не выбрали тип уборки.");
@@ -186,54 +282,194 @@ document.addEventListener("DOMContentLoaded", function() {
             if(streetInput.value === "") {
                 t_address[0].enable();
                 t_address[0].show();
-                // alert("Вы не ввели улицу.");
                 return;
             }
             if(houseInput.value === "") {
                 t_house[0].enable();
                 t_house[0].show();
-                // alert("Вы не ввели номер дома.");
                 return;
             }
             if(apartmentInput.value === "") {
                 t_apartment[0].enable();
                 t_apartment[0].show();
-                // alert("Вы не ввели номер квартиры.");
                 return;
             }
             if(entranceInput.value === "") {
                 t_entrance[0].enable();
                 t_entrance[0].show();
-                // alert("Вы не ввели номер подъезда.");
                 return;
             }
             if(floorInput.value === "") {
                 t_floor[0].enable();
                 t_floor[0].show();
-                // alert("Вы не ввели этаж.");
                 return;
             }
             if(dateInput.value === "") {
                 t_date[0].enable();
                 t_date[0].show();
-                // alert("Вы не ввели дату.");
                 return;
             }
-            if(timeInput.value === "") {
+            if(timeInput.value === "" || timeInput.value == 'undefined') {
                 t_time[0].enable();
                 t_time[0].show();
-                // alert("Вы не ввели время.");
                 return;
-            }
-            // На этом этапе все проверки 1-го шага пройдены можно переходить к следующему шагу
-    
-            mainHeading.innerHTML = 'Дополнительные услуги';
-            firstStep.classList.add('hidden');
-            secondStep.classList.remove('hidden');
-    
-            nextBtn.classList.add('dop-uslugi');
+            }    
+            // mainHeading.innerHTML = 'Дополнительные услуги';
+            // firstStep.classList.add('hidden');
+            // secondStep.classList.remove('hidden');
+            // prevBtn.classList.remove('hidden');
+            // prevBtn.classList.add('dop-uslugi');
+            // prevBtnBottom.classList.remove('hidden');
+            // prevBtnBottom.classList.add('dop-uslugi');
+            // evt.target.classList.add('dop-uslugi');
+
+            changeActiveStep(2);
+            changeActiveNum(2);
         }      
+    }
+
+    function changeActiveStep(aStep) {
+        aStep -= 1;
+        switch(aStep) {
+            case 0:
+                mainHeading.innerHTML = 'Заказать уборку в три шага';
+                firstStep.classList.remove('hidden');
+                secondStep.classList.add('hidden');
+                thirdStep.classList.add('hidden');
+                
+                prevBtn.classList.add('hidden');
+                prevBtnBottom.classList.add('hidden');
+                prevBtn.classList.remove('dop-uslugi');
+                prevBtnBottom.classList.remove('dop-uslugi');
+                prevBtn.classList.remove('end');
+                prevBtnBottom.classList.remove('end');
+                
+                nextBtn.classList.remove('dop-uslugi');
+                nextBtnBottom.classList.remove('dop-uslugi');
+                nextBtn.classList.remove('end');
+                nextBtnBottom.classList.remove('end');
+                nextBtn.innerHTML = 'Далее';
+                nextBtnBottom.innerHTML = 'Далее';
+                activeStep = 0;
+                break;
+            case 1:
+                mainHeading.innerHTML = 'Дополнительные услуги';
+                firstStep.classList.add('hidden');
+                secondStep.classList.remove('hidden');
+                thirdStep.classList.add('hidden');
+                
+                prevBtn.classList.remove('hidden');
+                prevBtnBottom.classList.remove('hidden');
+                prevBtn.classList.add('dop-uslugi');
+                prevBtnBottom.classList.add('dop-uslugi');
+                prevBtn.classList.remove('end');
+                prevBtnBottom.classList.remove('end');
+                
+                nextBtn.classList.add('dop-uslugi');
+                nextBtnBottom.classList.add('dop-uslugi');
+                nextBtn.classList.remove('end');
+                nextBtnBottom.classList.remove('end');
+                nextBtn.innerHTML = 'Далее';
+                nextBtnBottom.innerHTML = 'Далее';
+                activeStep = 1;
+                break;
+            case 2:
+                mainHeading.innerHTML = 'Расскажите о себе';
+                firstStep.classList.add('hidden');
+                secondStep.classList.add('hidden');
+                thirdStep.classList.remove('hidden');
+                
+                prevBtn.classList.remove('hidden');
+                prevBtnBottom.classList.remove('hidden');
+                prevBtn.classList.remove('dop-uslugi');
+                prevBtnBottom.classList.remove('dop-uslugi');
+                prevBtn.classList.add('end');
+                prevBtnBottom.classList.add('end');
+                
+                nextBtn.classList.remove('dop-uslugi');
+                nextBtnBottom.classList.remove('dop-uslugi');
+                nextBtn.classList.add('end');
+                nextBtnBottom.classList.add('end');
+                nextBtn.innerHTML = 'Заказать';
+                nextBtnBottom.innerHTML = 'Заказать';
+                activeStep = 2;
+                break;
+        }
+    }
+
+    function changeActiveNum(activeNum) {
+        let numList = numWrap.querySelectorAll('.num-wrap__item');
+        
+        activeNum -= 1;
+        numList[activeNum].classList.add('num-wrap__item_active');
+        numList[activeNum].classList.remove('num-wrap__item_done');
+        switch(activeNum) {
+            case 0:
+                numList[1].classList.remove('num-wrap__item_active');
+                numList[2].classList.remove('num-wrap__item_active');
+                numList[1].classList.remove('num-wrap__item_done');
+                numList[2].classList.remove('num-wrap__item_done');
+                break;
+            case 1:
+                numList[0].classList.remove('num-wrap__item_active');
+                numList[2].classList.remove('num-wrap__item_active');
+                numList[2].classList.remove('num-wrap__item_done');
+                numList[0].classList.add('num-wrap__item_done');
+                break;
+            case 2:
+                numList[0].classList.remove('num-wrap__item_active');
+                numList[1].classList.remove('num-wrap__item_active');
+                numList[0].classList.add('num-wrap__item_done');
+                numList[1].classList.add('num-wrap__item_done'); 
+                break;
+        }
+    }
+
+    numWrap.addEventListener('click', (evt) => {
+        if(!evt.target.classList.contains('num-wrap__item') && !evt.target.parentNode.classList.contains('num-wrap__item'))
+            return;
+
+        let number = evt.target.classList.contains('num-wrap__item') ? evt.target.children[0].textContent : evt.target.textContent;
+        if(number < (+activeStep + 1)) {
+            changeActiveNum(number);
+            changeActiveStep(number);
+        }
     });
+
+    function prevButtonClick(evt) {
+        if (evt.target.classList.contains('end')) {
+            evt.target.classList.remove('end');
+            evt.target.classList.add('dop-uslugi');
+
+            nextBtn.classList.remove('end');
+            nextBtn.classList.add('dop-uslugi');
+            nextBtnBottom.classList.remove('end');
+            nextBtnBottom.classList.add('dop-uslugi');
+
+            thirdStep.classList.add('hidden');
+            secondStep.classList.remove('hidden');
+            mainHeading.innerHTML = 'Дополнительные услуги';
+            nextBtn.innerHTML = 'Далее';
+            nextBtnBottom.innerHTML = 'Далее';
+            
+            changeActiveNum(2);
+        } else if(evt.target.classList.contains('dop-uslugi')) {
+            evt.target.classList.remove('dop-uslugi');
+            nextBtn.classList.remove('dop-uslugi');
+            nextBtnBottom.classList.remove('dop-uslugi');
+            evt.target.classList.add('hidden');
+            mainHeading.innerHTML = 'Заказать уборку в три шага';
+            firstStep.classList.remove('hidden');
+            secondStep.classList.add('hidden');
+            
+            changeActiveNum(1);
+        }
+    }
+
+
+
+
+
 
     // Доп услуги
     let orderServiceList = document.querySelector('.order-service');
@@ -253,6 +489,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 var li = orderServiceList.querySelector(`[data-index="${checkBox.value}"]`);
                 if(null != li)
                     orderServiceList.removeChild(li);
+                sumOfAddServices -= +checkBox.dataset.servicePrice;
             }
             else {
                 checkBox.checked = true;
@@ -262,10 +499,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 li.setAttribute('data-index', checkBox.value);
                 li.appendChild(document.createTextNode(closestItem.querySelector('.service-name').textContent));
                 orderServiceList.appendChild(li);
+                sumOfAddServices += +checkBox.dataset.servicePrice;
                 // orderServiceList.textContent = closestItem.querySelector('.service-name').textContent
                 
             }
-            console.log('checkbox ' + checkBox.checked);
+            recalculateTotal()
+            // console.log('checkbox ' + checkBox.checked);
         }
         
     });
@@ -392,22 +631,38 @@ document.addEventListener("DOMContentLoaded", function() {
     let timeStr = '';
     let dateAndTime = '';
 
-    dateInput.addEventListener('change', function(evt){
-        let date = new Date(evt.target.value);
-        
-        dateStr = date.getDate();
-        dateStr += '.' + date.getMonth();
-        dateStr += '.' + date.getFullYear();
-        dateAndTime = dateStr + ' ' + timeStr;
-        orderDate.textContent = dateAndTime;
-    });
+    // dateInput.addEventListener('change', function(evt){
+    //     let year = evt.target.value.substring(0,4);
+    //     let month = evt.target.value.substring(5,7);
+    //     let day = evt.target.value.substring(8,10);
+    //     console.log('DATE: ' + +year);
+
+    //     dateStr = day + '.' + month + '.' + year;
+    //     dateAndTime = dateStr + ' ' + timeStr;
+    //     orderDate.textContent = dateAndTime;
+    // });
+
     timeInput.addEventListener('change', function(evt){
+        console.log(evt.target.value);
         timeStr = evt.target.value;
+        if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
+            t_time[0].enable();
+            t_time[0].show();
+            evt.target.value = '';
+            return;
+        }
         dateAndTime = dateStr + ' ' + timeStr;
         orderDate.textContent = dateAndTime;
     });
     timeInput.addEventListener('input', function(evt){
+        console.log(evt.target.value);
         timeStr = evt.target.value;
+        if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
+            t_time[0].enable();
+            t_time[0].show();
+            evt.target.value = '';
+            return;
+        }
         dateAndTime = dateStr + ' ' + timeStr;
         orderDate.textContent = dateAndTime;
     });

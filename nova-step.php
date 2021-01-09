@@ -15,9 +15,10 @@
 function nova_step_admin_settings_init() {
     register_setting('novastep', 'novastep_setting_name');
 
+    // Секция и поля для типа уборки
     add_settings_section(
         'novastep_settings_section',
-        'Заголовок секции',
+        'Тип уборки',
         'wporg_settings_section_callback',
         'novastep'
     );
@@ -41,7 +42,29 @@ function nova_step_admin_settings_init() {
         'Послестроительная уборка', 'wporg_settings_field_callback3',
         'novastep',
         'novastep_settings_section'
-    );   
+    );  
+    
+    // Секция Разное (Для квадр метра)
+    add_settings_section(
+        'novastep_other_section',
+        'Разное',
+        'wporg_settings_section_callback',
+        'novastep'
+    );
+    add_settings_field(
+        'sq_price',
+        'Цена за кв. м', 'novastep_settings_sq_price_callback',
+        'novastep',
+        'novastep_other_section'
+    );
+
+    // Секции и поля для доп услуг
+    add_settings_section(
+        'novastep_dopuslugi_section',
+        'Дополнительные услуги',
+        'novastep_dopuslugi_section_callback',
+        'novastep'
+    );
 }
 
 add_action('admin_init', 'nova_step_admin_settings_init');
@@ -75,7 +98,20 @@ function wporg_settings_field_callback3() {
 }
 
 function wporg_settings_section_callback() {
-    echo '<p>WPOrg Section Introduction.</p>';
+    echo '';
+}
+
+function novastep_dopuslugi_section_callback() {
+    echo '<button class="add-dopuslugu" type="button">Добавить доп. услугу</button>';
+}
+
+function novastep_settings_sq_price_callback() {
+    // get the value of the setting we've registered with register_setting()
+    $setting = get_option('novastep_setting_name');
+    // output the field
+    ?>
+    <input type="number" name="novastep_setting_name[sq_price]" value="<?php echo $setting['sq_price']?>"> ₽
+    <?php
 }
 
 function nova_step_add_to_admin_panel() {
@@ -130,7 +166,39 @@ add_action('wp_enqueue_scripts', 'callback_for_setting_up_scripts');
 function callback_for_setting_up_scripts() {
     wp_register_style( 'namespace', plugins_url('assets/css/main.css', __FILE__));
     wp_enqueue_style( 'namespace' );
-    wp_enqueue_script( 'namespaceformyscript', plugins_url('/assets/js/main.js', __FILE__), array( 'jquery' ));
+
+    // // wp_register_style( 'timepickercss', 'https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css', array(), null );
+    // // wp_enqueue_style( 'timepickercss' );
+
+    // // wp_register_script( 'timepickerjs', 'https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js', null, null, true );
+    // // wp_enqueue_script( 'timepickerjs' );
+    
+    // wp_register_style( 'suggestionscss', 'https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/css/suggestions.min.css');
+    // wp_enqueue_style( 'suggestionscss' );
+    // wp_register_script( 'suggestionsjs', 'https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/js/jquery.suggestions.min.js', null, null, true );
+    // wp_enqueue_script( 'suggestionsjs' );
+
+    wp_register_style( 'AirCSS', plugins_url('/air-datepicker/css/datepicker.css', __FILE__));
+    wp_enqueue_style( 'AirCSS' );
+    wp_register_script( 'AirJS', plugins_url('/air-datepicker/js/datepicker.js', __FILE__), null, null, true );
+    wp_enqueue_script('AirJS');
+
+    wp_register_script( 'IMask', 'https://unpkg.com/imask', null, null, true );
+    wp_enqueue_script('IMask');
+
+    wp_register_script( 'Popper', 'https://unpkg.com/@popperjs/core@2', null, null, true );
+    wp_enqueue_script('Popper');
+    
+    wp_register_script( 'Tippy', 'https://unpkg.com/tippy.js@6', null, null, true );
+    wp_enqueue_script('Tippy');
+    
+    if( is_page( 'calc')) {
+        // wp_enqueue_script( 'namespaceformyscript', plugins_url('/assets/js/main.js', __FILE__), array( 'jquery', 'Popper', 'Tippy', 'IMask', 'timepickerjs'));
+        wp_enqueue_script( 'namespaceformyscript', plugins_url('/assets/js/main.js', __FILE__), array( 'jquery', 'Popper', 'Tippy', 'IMask'));
+    }
+    if( is_page( '2')) {
+        wp_enqueue_script( 'namespaceformyscript', plugins_url('/assets/js/index.js', __FILE__), array( 'jquery', 'Popper', 'Tippy', 'IMask'));
+    }
 }
 
 
@@ -155,7 +223,7 @@ function wporg_shortcode_main() {
 
 function wporg_shortcode_vidget() {
     ob_start();
-    require('vidgetview.html');
+    require('vidgetview.php');
     return ob_get_clean();
 }
 

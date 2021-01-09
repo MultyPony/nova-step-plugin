@@ -1,20 +1,28 @@
 <div class="ns_vidget">
-    <h2>THIS IS MY VIDGET BITCH!!!</h2>
-    <form action="">
-        <label>
-            Количество кв м
-            <button>-</button>
-            <input type="number" value="1" name="square">
-            <button>+</button>
-        </label>
-        <label>
-            Поддерживающая
-            <input type="radio" name="clean-type" value="support" checked>
-        </label>
-        <label>
-            Генеральная
-            <input type="radio" name="clean-type" value="main">
-        </label>
+    <form class="ns_vidget_form" action="" method="post">
+        <div class="clean-type-wrap ">
+            <label class="clean-type-label clean-type-label__checked">
+                Поддерживающая 
+                <input type="radio" name="clean-type" value="support" checked>
+                <p class="clean-type-price">
+                    <?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?> ₽
+                </p>
+            </label>
+            <label class="clean-type-label">
+                Генеральная
+                <input type="radio" name="clean-type" value="main">
+                <p class="clean-type-price">
+                    <?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?> ₽
+                </p>
+            </label>
+            <label class="clean-type-label">
+                Послестроительная уборка
+                <input type="radio" name="clean-type" value="build">
+                <p class="clean-type-price">
+                        <?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?> ₽
+                </p>
+            </label>
+        </div>
         <button type="submit">Заказать уборку</button>
     </form>
 </div>
