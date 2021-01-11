@@ -1,7 +1,11 @@
 <div class="wrap">
     <h1 class="ns_main-heading">Заказать уборку в три шага</h1>
     <div class="form-container">
-        <form class="main-form" action="" method="post" onsubmit="event.preventDefault();">
+        <form class="main-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="event.preventDefault();">
+        <!-- <form class="main-form" action="" method="post" onsubmit="event.preventDefault();"> -->
+            <input type="hidden" name="action" value="nova_step_hook">
+            <!-- <input type="hidden" name="custom_nonce" value="<?php echo $custom_form_nonce?>"> -->
+            
             <input id="square-meters" type="hidden" name="square-meters" value="20" data-sq-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['sq_price'];?>">
             <input id="total-price" type="hidden" name="total-price">
             <div class="first-step">
@@ -31,12 +35,12 @@
                         </label>
                     </div>
                 </fieldset>
-                <fieldset>
+                <fieldset class="mobile-square">
                     <legend class="legend">Площадь помещения, м2</legend>
                     <div class="input-wrap">
-                        <div class="input-num">
+                        <div class="input-num-mobile">
                             <button class="input-num__button input-num__button_min" id="square-min-btn" type="button"></button>
-                            <input class="input-num__display" id="sqm-dup" type="number" value="20">
+                            <input class="input-num__display" id="sqm-dup-mobile" type="number" value="20">
                             <button class="input-num__button input-num__button_plus" id="square-plus-btn" type="button"></button>
                         </div>
                     </div>
@@ -288,69 +292,49 @@
 </script>
 
 <?php
-    $addServicesArray = [
-        "1" => "Чистка вытяжки",
-        "2" => "Мытье шкафов изнутри",
-        "3" => "Замена постельного белья",
-        "4" => "Мытье окон",
-        "5" => "Чистка микроволновой печи",
-        "6" => "Мытье духового шкафа изнутри",
-        "7" => "Мытье холодильника изнутри",
-        "8" => "Доставка и забор ключей",
-        "9" => "Уборка на балконе",
-    ];
+    // $addServicesArray = [
+    //     "1" => "Чистка вытяжки",
+    //     "2" => "Мытье шкафов изнутри",
+    //     "3" => "Замена постельного белья",
+    //     "4" => "Мытье окон",
+    //     "5" => "Чистка микроволновой печи",
+    //     "6" => "Мытье духового шкафа изнутри",
+    //     "7" => "Мытье холодильника изнутри",
+    //     "8" => "Доставка и забор ключей",
+    //     "9" => "Уборка на балконе",
+    // ];
 
-    $cleanTypeArray = [
-        "support" => "Поддерживающая",
-        "build" => "Послестроительная уборка",
-        "main" => "Генеральная"
-    ];
+    // $cleanTypeArray = [
+    //     "support" => "Поддерживающая",
+    //     "build" => "Послестроительная уборка",
+    //     "main" => "Генеральная"
+    // ];
 
-    // $service_list = "";
-    // if(!empty($_POST['services'])) {
-    //     foreach($_POST['services'] as $service) {
-    //         $service_list .= "- " . $addServicesArray[$service] . "\n"; 
-    //     }
-    // }
     
-    // if ( ! empty( $_POST['house'] ) ) {
-    // $message = 'Тип уборки: ' . $cleanTypeArray[$_POST['clean-type']] . "\n";
-    // $message .= 'Кв. м: ' . $_POST['square-meters'] . "\n";
-    // $message .= "Дополнительные услуги\n";
-    // $message .= $service_list;
-    // $message .= "Дата: " . $_POST['ns_date'] . " " . $_POST['ns_time'] . "\n";
-    // $message .= "Адрес: ул. " . $_POST['address'] . ", д. " . $_POST['house'] ;
-    // $message .= ", кв. " . $_POST['apartment-number'] . "\n";
-    // $message .= 'Подъезд №: ' . $_POST['entrance'] . "\n";
-    // $message .= "Имя: " . (empty($_POST['ns_name']) ? "-" : $_POST['ns_name']) . "\n";
-    // $message .= "Телефон: " . (empty($_POST['ns_tel']) ? "-" : $_POST['ns_tel']) . "\n";
-    // $message .= "Почта: " . (empty($_POST['ns_email']) ? "-" : $_POST['ns_email']) . "\n";
 
-    $cleanType = isset($_POST['clean-type']) ? $_POST['clean-type'] : 'support';
-    $body = '<div style="font-size: 16px;"><h1>Заказ с сайта</h1>
-            <p><strong>Тип уборки:</strong> ' . $cleanTypeArray[$cleanType] . '</p>
-            <p><strong>Кв. м:</strong> ' . $_POST['square-meters'] . '</p>';
+    // $cleanType = isset($_POST['clean-type']) ? $_POST['clean-type'] : 'support';
+    // $body = '<div style="font-size: 16px;"><h1>Заказ с сайта</h1>
+    //         <p><strong>Тип уборки:</strong> ' . $cleanTypeArray[$cleanType] . '</p>
+    //         <p><strong>Кв. м:</strong> ' . $_POST['square-meters'] . '</p>';
 
-    if(!empty($_POST['services'])) {
-        $body .= '<h2>Дополнительные услуги</h2><ul>';
-        foreach($_POST['services'] as $service) {
-            $body .= '<li>' . $addServicesArray[$service] . '</li>';
-        }
-        $body .= '</ul>';
-    }
-    $body .= '<p><strong>Дата:</strong> ' . $_POST['ns_date'] . " " . $_POST['ns_time'] . '</p>';
-    $body .= '<p><strong>Адрес: </strong> ' . $_POST['address'] . ", д. " . $_POST['house'];
-    $body .= ', кв. ' . $_POST['apartment-number'];
-    $body .= '<p><strong>Подъезд №:</strong> ' . $_POST['entrance'] . '</p>';
-    $body .= '<p><strong>Этаж:</strong> ' . $_POST['floor'] . '</p>';
-    $body .= '<p><strong>Имя:</strong> ' . $_POST['ns_name'] . '</p>';
-    $body .= '<p><strong>Телефон:</strong> <a href="tel:' . $_POST['ns_tel'] . '">' . $_POST['ns_tel'] . '</a></p>';
-    $body .= '<p><strong>Почта:</strong> ' . (empty($_POST['ns_email']) ? "-" : $_POST['ns_email']) . '</p>';
-    $body .= '<p><strong style="font-size: 20px;">Цена:</strong> ' . $_POST['total-price'] . ' ₽</p>';
-    $body .= '</div>';
-
-    $headers[] = 'Content-type: text/html; charset=utf-8'; // в виде массива
-    wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', $body, $headers);
+    // if(!empty($_POST['services'])) {
+    //     $body .= '<h2>Дополнительные услуги</h2><ul>';
+    //     foreach($_POST['services'] as $service) {
+    //         $body .= '<li>' . $addServicesArray[$service] . '</li>';
+    //     }
+    //     $body .= '</ul>';
     // }
+    // $body .= '<p><strong>Дата:</strong> ' . $_POST['ns_date'] . " " . $_POST['ns_time'] . '</p>';
+    // $body .= '<p><strong>Адрес: </strong> ' . $_POST['address'] . ", д. " . $_POST['house'];
+    // $body .= ', кв. ' . $_POST['apartment-number'];
+    // $body .= '<p><strong>Подъезд №:</strong> ' . $_POST['entrance'] . '</p>';
+    // $body .= '<p><strong>Этаж:</strong> ' . $_POST['floor'] . '</p>';
+    // $body .= '<p><strong>Имя:</strong> ' . $_POST['ns_name'] . '</p>';
+    // $body .= '<p><strong>Телефон:</strong> <a href="tel:' . $_POST['ns_tel'] . '">' . $_POST['ns_tel'] . '</a></p>';
+    // $body .= '<p><strong>Почта:</strong> ' . (empty($_POST['ns_email']) ? "-" : $_POST['ns_email']) . '</p>';
+    // $body .= '<p><strong style="font-size: 20px;">Цена:</strong> ' . $_POST['total-price'] . ' ₽</p>';
+    // $body .= '</div>';
 
+    // $headers[] = 'Content-type: text/html; charset=utf-8';
+    // wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', $body, $headers);
 ?>

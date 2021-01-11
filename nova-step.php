@@ -237,4 +237,63 @@ function wporg_shortcodes_init() {
  
 add_action( 'init', 'wporg_shortcodes_init' );
 
+
+
+
+
+
+
+    add_action('admin_post_nova_step_hook', 'the_nova_action_hook_callback');
+    add_action('admin_post_nopriv_nova_step_hook', 'the_nova_action_hook_callback');
+    function the_nova_action_hook_callback() {
+        // status_header(200);
+        $addServicesArray = [
+            "1" => "Чистка вытяжки",
+            "2" => "Мытье шкафов изнутри",
+            "3" => "Замена постельного белья",
+            "4" => "Мытье окон",
+            "5" => "Чистка микроволновой печи",
+            "6" => "Мытье духового шкафа изнутри",
+            "7" => "Мытье холодильника изнутри",
+            "8" => "Доставка и забор ключей",
+            "9" => "Уборка на балконе",
+        ];
+    
+        $cleanTypeArray = [
+            "support" => "Поддерживающая",
+            "build" => "Послестроительная уборка",
+            "main" => "Генеральная"
+        ];
+    
+        
+    
+        $cleanType = isset($_POST['clean-type']) ? $_POST['clean-type'] : 'support';
+        $body = '<div style="font-size: 16px;"><h1>Заказ с сайта</h1>
+                <p><strong>Тип уборки:</strong> ' . $cleanTypeArray[$cleanType] . '</p>
+                <p><strong>Кв. м:</strong> ' . $_POST['square-meters'] . '</p>';
+    
+        if(!empty($_POST['services'])) {
+            $body .= '<h2>Дополнительные услуги</h2><ul>';
+            foreach($_POST['services'] as $service) {
+                $body .= '<li>' . $addServicesArray[$service] . '</li>';
+            }
+            $body .= '</ul>';
+        }
+        $body .= '<p><strong>Дата:</strong> ' . $_POST['ns_date'] . " " . $_POST['ns_time'] . '</p>';
+        $body .= '<p><strong>Адрес: </strong> ' . $_POST['address'] . ", д. " . $_POST['house'];
+        $body .= ', кв. ' . $_POST['apartment-number'];
+        $body .= '<p><strong>Подъезд №:</strong> ' . $_POST['entrance'] . '</p>';
+        $body .= '<p><strong>Этаж:</strong> ' . $_POST['floor'] . '</p>';
+        $body .= '<p><strong>Имя:</strong> ' . $_POST['ns_name'] . '</p>';
+        $body .= '<p><strong>Телефон:</strong> <a href="tel:' . $_POST['ns_tel'] . '">' . $_POST['ns_tel'] . '</a></p>';
+        $body .= '<p><strong>Почта:</strong> ' . (empty($_POST['ns_email']) ? "-" : $_POST['ns_email']) . '</p>';
+        $body .= '<p><strong style="font-size: 20px;">Цена:</strong> ' . $_POST['total-price'] . ' ₽</p>';
+        $body .= '</div>';
+    
+        $headers[] = 'Content-type: text/html; charset=utf-8';
+        wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', $body, $headers);
+        wp_redirect( get_site_url() . '/calc', 301 ); 
+        exit;
+    }
+
  ?>

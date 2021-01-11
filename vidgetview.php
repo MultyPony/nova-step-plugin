@@ -23,6 +23,13 @@
                 </p>
             </label>
         </div>
+        <div class="input-wrap">
+                        <div class="input-num-mobile">
+                            <button class="input-num__button input-num__button_min" id="square-min-btn" type="button"></button>
+                            <input class="input-num__display" id="sqm-dup-mobile" type="number" value="20">
+                            <button class="input-num__button input-num__button_plus" id="square-plus-btn" type="button"></button>
+                        </div>
+                    </div>
         <button type="submit">Заказать уборку</button>
     </form>
 </div>

@@ -83,13 +83,20 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     t_tel[0].disable();
 
-    let t_inputDisplay = tippy('.input-num__display', {
+    let t_mobileInputDisplay = tippy('#sqm-dup-mobile', {
         content: 'Введите положительное число',
         placement: 'bottom',
         theme: 'tomato',
         trigger: 'manual',
     });
-    t_inputDisplay[0].disable();
+    t_mobileInputDisplay[0].disable();
+    let t_orderInputDisplay = tippy('#sqm-dup', {
+        content: 'Введите положительное число',
+        placement: 'bottom',
+        theme: 'tomato',
+        trigger: 'manual',
+    });
+    t_orderInputDisplay[0].disable();
 
 
     // Цена
@@ -186,12 +193,9 @@ document.addEventListener("DOMContentLoaded", function() {
     $('.date-input').datepicker({
         onHide: function(inst, animationCompleted) {
             if(animationCompleted) {
-                console.log("YEAHHH BEATCHHH!!");
-                console.log(inst.el.value);
                 let year = inst.el.value.substring(6,10);
                 let month = inst.el.value.substring(3,5);
                 let day = inst.el.value.substring(0,2);
-                console.log('DATE: ' + +year);
                 
                 if (day == '' || month == '' || year == '')
                     dateStr = '';
@@ -202,12 +206,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         },
         onSelect: function(formattedDate, date, inst) {
-            console.log("YEAHHH BEATCHHH!!");
-            console.log(formattedDate);
             let year = inst.el.value.substring(6,10);
             let month = inst.el.value.substring(3,5);
             let day = inst.el.value.substring(0,2);
-            console.log('DATE: ' + +year);
             
             if (day == '' || month == '' || year == '')
                 dateStr = '';
@@ -524,36 +525,77 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let sqDup = document.getElementById('sqm-dup');
     let sqDupWrap = document.querySelector('.input-num');
+    let sqDupMobile = document.getElementById('sqm-dup-mobile');
+    let sqDupWrapMobile = document.querySelector('.input-num-mobile');
 
-    sqDup.addEventListener('change', function() {
-        if(sqDup.value <= 0) {
-            sqDup.value = 1;
-            sqMetersInput.value = sqDup.value;
-            t_inputDisplay[0].enable();
-            t_inputDisplay[0].show();
+    sqMetersInput.addEventListener('change', ()=> {
+        sqDup.value = sqMetersInput.value;
+        sqDupMobile.value = sqMetersInput.value;
+    });
+
+    sqDup.addEventListener('change', sqChange);
+    sqDupMobile.addEventListener('change', sqChange);
+
+    function sqChange(evt) {
+        if(evt.target.value <= 0) {
+            evt.target.value = 1;
+
+            // sqMetersInput.value = evt.target.value; // Вынести в ф-цию
+            updateOriginSq(evt.target.value);
+            if (evt.target.id === 'sqm-dup-mobile') {
+                t_mobileInputDisplay[0].enable();
+                t_mobileInputDisplay[0].show();
+            } else if (evt.target.id === 'sqm-dup') {
+                t_orderInputDisplay[0].enable();
+                t_orderInputDisplay[0].show();
+            }
         }
         else {
-            sqMetersInput.value = sqDup.value;
+            updateOriginSq(evt.target.value);
+            // sqMetersInput.value = evt.target.value;  // Вынести в ф-цию
+            // let event = new Event('change');    // Вынести в ф-цию
+            // sqMetersInput.dispatchEvent(event); // Вынести в ф-цию
         }
-        console.log('MAIN_VALUE-1: ' + sqDup.value);
-    });
+    }
+
+
     sqDup.addEventListener('focusout', recalculateTotal);
     sqDup.addEventListener('input', recalculateTotal);
-
-    sqDupWrap.addEventListener('click', function(evt) {
-        if(evt.target.id === 'square-min-btn') {
-            if(sqDup.value <= 1) return;
-            sqDup.value = +sqDup.value - 1;
-            sqMetersInput.value = sqDup.value;
+    sqDupMobile.addEventListener('focusout', recalculateTotal);
+    sqDupMobile.addEventListener('input', recalculateTotal);
+    
+    sqDupWrap.addEventListener('click', sqClick);
+    sqDupWrapMobile.addEventListener('click', sqClick);
+   
+    function sqClick(evt) {
+        let sqD;
+        if(evt.target.classList.contains('input-num-mobile') || evt.target.classList.contains('input-num')) {
+            sqD = evt.target.querySelector('.input-num__display');
+        } else {
+            sqD = evt.target.parentNode.querySelector('.input-num__display');
         }
-        else if (evt.target.id === 'square-plus-btn') {
-            sqDup.value = +sqDup.value + 1;
-            sqMetersInput.value = sqDup.value;
+
+        if(evt.target.classList.contains('input-num__button_min')) {
+            if(sqD.value <= 1) return;
+            sqD.value = +sqD.value - 1;
+
+            // sqMetersInput.value = sqD.value; // Вынести в ф-цию
+            updateOriginSq(sqD.value);
+        }
+        else if(evt.target.classList.contains('input-num__button_plus')) {
+            sqD.value = +sqD.value + 1;
+
+            // sqMetersInput.value = sqD.value; // Вынести в ф-цию
+            updateOriginSq(sqD.value);
         }
         recalculateTotal();
-        console.log('MAIN_VALUE-2: ' + sqDup.value);
-    });
-    
+    }
+
+    function updateOriginSq(newValue) {
+        let event = new Event('change');    // Вынести в ф-цию
+        sqMetersInput.value = newValue;  // Вынести в ф-цию
+        sqMetersInput.dispatchEvent(event); // Вынести в ф-цию    
+    }
 
     // SIDEBAR
 
@@ -643,7 +685,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // });
 
     timeInput.addEventListener('change', function(evt){
-        console.log(evt.target.value);
+        // console.log(evt.target.value);
         timeStr = evt.target.value;
         if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
             t_time[0].enable();
@@ -655,7 +697,7 @@ document.addEventListener("DOMContentLoaded", function() {
         orderDate.textContent = dateAndTime;
     });
     timeInput.addEventListener('input', function(evt){
-        console.log(evt.target.value);
+        // console.log(evt.target.value);
         timeStr = evt.target.value;
         if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
             t_time[0].enable();
