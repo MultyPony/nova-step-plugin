@@ -1,8 +1,22 @@
 const OPENING_HOUR = 9;
 const CLOSING_HOUR = 21;
 
-document.addEventListener("DOMContentLoaded", function() {
 // window.addEventListener("load", function() {
+document.addEventListener("DOMContentLoaded", function() {
+    // Тип уборки
+
+    function getChecked(groupName) {
+        let radios = document.getElementsByName( groupName );
+        for( i = 0; i < radios.length; i++ ) {
+            if( radios[i].checked ) {
+                return radios[i];
+            }
+        }
+        return null;
+    }
+
+    getChecked('clean-type').parentNode.classList.add('clean-type-label__checked');
+
     document.getElementById('Footer').remove();
 
 
@@ -130,6 +144,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Тип уборки
+
+    
+
     let wrap = document.querySelector(".clean-type-wrap");
     wrap.addEventListener("click", function(evt) {
         let ch = Array.from(wrap.children);

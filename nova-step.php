@@ -240,7 +240,19 @@ add_action( 'init', 'wporg_shortcodes_init' );
 
 
 
-
+    add_action('admin_post_nova_step_vidget_hook', 'the_nova_vidget_action_hook_callback');
+    add_action('admin_post_nopriv_nova_step_vidget_hook', 'the_nova_vidget_action_hook_callback');
+    function the_nova_vidget_action_hook_callback() {
+        // $_POST['clean-type']
+        // $_POST['square-meters']
+        $body = 'Тип уборки: ' . $_POST['clean-type'] . "\nКв. м: " . $_POST['square-meters'];
+        // wp_mail('meshcheryakovvrn@gmail.com', 'Тест виджета', $body);
+        $tel = '';
+       if(isset($_POST['ns_tel'])) {
+            $tel = ltrim($_POST['ns_tel'], "+7");  
+       }
+        wp_redirect( get_site_url() . '/calc?square-meters=' . $_POST['square-meters'] . '&clean-type=' . $_POST['clean-type'] . '&ns_tel=' . $tel, 301 ); 
+    }
 
 
     add_action('admin_post_nova_step_hook', 'the_nova_action_hook_callback');

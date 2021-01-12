@@ -1,3 +1,26 @@
+<?php 
+    $t_support = '';
+    $t_main = '';
+    $t_build = '';
+
+    if (isset($_GET['clean-type'])) {
+        // $t_support = 'checked';
+        switch ($_GET['clean-type']) {
+            case 'support':
+                $t_support = 'checked';
+                break;
+            case 'main':
+                $t_main = 'checked';
+                break;
+            case 'build':
+                $t_build = 'checked';
+                break;
+        }
+    } else {
+        $t_support = 'checked';
+    }
+?>
+
 <div class="wrap">
     <h1 class="ns_main-heading">Заказать уборку в три шага</h1>
     <div class="form-container">
@@ -6,29 +29,30 @@
             <input type="hidden" name="action" value="nova_step_hook">
             <!-- <input type="hidden" name="custom_nonce" value="<?php echo $custom_form_nonce?>"> -->
             
-            <input id="square-meters" type="hidden" name="square-meters" value="20" data-sq-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['sq_price'];?>">
+            <input id="square-meters" type="hidden" name="square-meters" value="<?php echo isset($_GET['square-meters']) ? $_GET['square-meters'] : 20 ?>" data-sq-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['sq_price'];?>">
             <input id="total-price" type="hidden" name="total-price">
             <div class="first-step">
                 <fieldset>
                     <legend class="legend">Выберите тип уборки</legend>
                     <div class="clean-type-wrap">
-                        <label class="clean-type-label clean-type-label__checked">
+                        <!-- <label class="clean-type-label clean-type-label__checked"> -->
+                        <label class="clean-type-label">
                             <span class="clean-title">Поддерживающая</span> 
-                            <input type="radio" name="clean-type" value="support" checked data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?>">
+                            <input type="radio" name="clean-type" value="support" <?php echo $t_support ?> data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?>">
                             <p class="clean-type-price">
                                 <?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?> ₽
                             </p>
                         </label>
                         <label class="clean-type-label">
                             <span class="clean-title">Генеральная</span>
-                            <input type="radio" name="clean-type" value="main" data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?>">
+                            <input type="radio" name="clean-type" value="main" <?php echo $t_main ?> data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?>">
                             <p class="clean-type-price">
                                 <?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?> ₽
                             </p>
                         </label>
                         <label class="clean-type-label">
                             <span class="clean-title">Послестроительная уборка</span>
-                            <input type="radio" name="clean-type" value="build" data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?>">
+                            <input type="radio" name="clean-type" value="build" <?php echo $t_build ?> data-price="<?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?>">
                             <p class="clean-type-price">
                                     <?php $setting = get_option('novastep_setting_name'); echo $setting['post-construction_clean'];?> ₽
                             </p>
@@ -36,11 +60,11 @@
                     </div>
                 </fieldset>
                 <fieldset class="mobile-square">
-                    <legend class="legend">Площадь помещения, м2</legend>
+                    <legend class="legend">Площадь помещения, м<sup>2</sup></legend>
                     <div class="input-wrap">
                         <div class="input-num-mobile">
                             <button class="input-num__button input-num__button_min" id="square-min-btn" type="button"></button>
-                            <input class="input-num__display" id="sqm-dup-mobile" type="number" value="20">
+                            <input class="input-num__display" id="sqm-dup-mobile" type="number" value="<?php echo isset($_GET['square-meters']) ? $_GET['square-meters'] : 20 ?>">
                             <button class="input-num__button input-num__button_plus" id="square-plus-btn" type="button"></button>
                         </div>
                     </div>
@@ -178,7 +202,7 @@
                     </label>
                     <label>
                         Телефон
-                        <input class="ns_tel" type="text" name="ns_tel">
+                        <input class="ns_tel" type="text" name="ns_tel" value="<?php echo isset($_GET['ns_tel']) ? $_GET['ns_tel'] : '' ?>">
                     </label>
                     <label>
                         Почта
@@ -211,10 +235,10 @@
             <p class="order-address"></p>
             <p class="order-date-title">Дата и время:</p>
             <p class="order-date"></p>
-            <p class="order-square-title">Площадь помещения, м2</p>
+            <p class="order-square-title">Площадь помещения, м<sup>2</sup></p>
             <div class="input-num">
                 <button class="input-num__button input-num__button_min" id="square-min-btn" type="button"></button>
-                <input class="input-num__display" id="sqm-dup" type="number" value="20">
+                <input class="input-num__display" id="sqm-dup" type="number" value="<?php echo isset($_GET['square-meters']) ? $_GET['square-meters'] : 20 ?>">
                 <button class="input-num__button input-num__button_plus" id="square-plus-btn" type="button"></button>
             </div>
             <p class="order-service-title">Доп. услуги:</p>
@@ -232,6 +256,60 @@
         <button class="next-btn" type="button">Далее</button>
         <p class="order-price"></p>
     </div>
+
+
+
+
+
+
+
+
+    <div class="ns_vidget">
+        <form class="ns_vidget_form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+            <input type="hidden" name="action" value="nova_step_vidget_hook">
+            <div class="ns_row ns_row-1">
+                <div class="ns_sq-wrap">
+                    <p class="ns_sq-title">Площадь помещения, м<sup>2</sup></p>
+                    <div class="ns_input-num">
+                        <button class="ns_sq-btn ns_sq-btn-min" id="square-min-btn" type="button"></button>
+                        <input class="ns_sq-input input-num__display" id="sqm-dup" type="number" value="<?php echo $_GET['square-meters'] ?>">
+                        <button class="ns_sq-btn ns_sq-btn-plus" id="square-plus-btn" type="button"></button>
+                    </div>
+                </div>
+
+                <div class="clean-type-wrap ns_clean-type-wrap">
+                    <label class="clean-type-label clean-type-label__checked">
+                        Поддерживающая 
+                        <input type="radio" name="clean-type" value="support" checked>
+                        <p class="clean-type-price">
+                            <?php $setting = get_option('novastep_setting_name'); echo $setting['support_clean'];?> ₽
+                        </p>
+                    </label>
+                    <label class="clean-type-label">
+                        Генеральная
+                        <input type="radio" name="clean-type" value="main">
+                        <p class="clean-type-price">
+                            <?php $setting = get_option('novastep_setting_name'); echo $setting['main_clean'];?> ₽
+                        </p>
+                    </label>
+                </div>
+            </div>
+            <div class="ns_row ns_row-2">
+                <label class="ns_tel-label">
+                    Введите номер:
+                    <input class="ns_tel-input" type="text" name="ns_tel">
+                </label>
+                <button class="ns_submit-btn" type="submit">Заказать уборку</button>
+            </div>       
+        </form>
+    </div>
+
+
+
+
+
+
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@20.3.0/dist/css/suggestions.min.css" rel="stylesheet" />
@@ -290,51 +368,3 @@
         // addToBody: true,
     });
 </script>
-
-<?php
-    // $addServicesArray = [
-    //     "1" => "Чистка вытяжки",
-    //     "2" => "Мытье шкафов изнутри",
-    //     "3" => "Замена постельного белья",
-    //     "4" => "Мытье окон",
-    //     "5" => "Чистка микроволновой печи",
-    //     "6" => "Мытье духового шкафа изнутри",
-    //     "7" => "Мытье холодильника изнутри",
-    //     "8" => "Доставка и забор ключей",
-    //     "9" => "Уборка на балконе",
-    // ];
-
-    // $cleanTypeArray = [
-    //     "support" => "Поддерживающая",
-    //     "build" => "Послестроительная уборка",
-    //     "main" => "Генеральная"
-    // ];
-
-    
-
-    // $cleanType = isset($_POST['clean-type']) ? $_POST['clean-type'] : 'support';
-    // $body = '<div style="font-size: 16px;"><h1>Заказ с сайта</h1>
-    //         <p><strong>Тип уборки:</strong> ' . $cleanTypeArray[$cleanType] . '</p>
-    //         <p><strong>Кв. м:</strong> ' . $_POST['square-meters'] . '</p>';
-
-    // if(!empty($_POST['services'])) {
-    //     $body .= '<h2>Дополнительные услуги</h2><ul>';
-    //     foreach($_POST['services'] as $service) {
-    //         $body .= '<li>' . $addServicesArray[$service] . '</li>';
-    //     }
-    //     $body .= '</ul>';
-    // }
-    // $body .= '<p><strong>Дата:</strong> ' . $_POST['ns_date'] . " " . $_POST['ns_time'] . '</p>';
-    // $body .= '<p><strong>Адрес: </strong> ' . $_POST['address'] . ", д. " . $_POST['house'];
-    // $body .= ', кв. ' . $_POST['apartment-number'];
-    // $body .= '<p><strong>Подъезд №:</strong> ' . $_POST['entrance'] . '</p>';
-    // $body .= '<p><strong>Этаж:</strong> ' . $_POST['floor'] . '</p>';
-    // $body .= '<p><strong>Имя:</strong> ' . $_POST['ns_name'] . '</p>';
-    // $body .= '<p><strong>Телефон:</strong> <a href="tel:' . $_POST['ns_tel'] . '">' . $_POST['ns_tel'] . '</a></p>';
-    // $body .= '<p><strong>Почта:</strong> ' . (empty($_POST['ns_email']) ? "-" : $_POST['ns_email']) . '</p>';
-    // $body .= '<p><strong style="font-size: 20px;">Цена:</strong> ' . $_POST['total-price'] . ' ₽</p>';
-    // $body .= '</div>';
-
-    // $headers[] = 'Content-type: text/html; charset=utf-8';
-    // wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', $body, $headers);
-?>
