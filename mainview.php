@@ -19,10 +19,30 @@
     } else {
         $t_support = 'checked';
     }
+
+    // add_option( 'my_option', '255' );
+    // add_option('wporg_dates_option', 'hello world!');
+
+    // $arr_source = get_option('wporg_dates_option');
+    // $arr_new = array('a', 'b', 'c');
+    // $res = array_merge($arr_source, $arr_new);
+    // update_option('wporg_dates_option', $res);
+    
+    // $headers[] = 'Content-type: text/html; charset=utf-8';
+    // wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', 'Приваепта', $headers);
+    // wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', 'Приваепта');
 ?>
 
 <div class="wrap">
-    <h1 class="ns_main-heading">Заказать уборку в три шага</h1>
+    <h1 class="ns_main-heading">
+    <!-- <?php echo get_option('wporg_dates_option');?> -->
+    <?php 
+        $bd = get_option('wporg_dates_option');
+        // $bd['07.02.2021'] = array('19:00');
+        // update_option('wporg_dates_option', $bd);
+    ?>
+    <!-- <?php echo date("d.m.Y");?> -->
+    Заказать уборку в три шага</h1>
     <div class="form-container">
         <form class="main-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" onsubmit="event.preventDefault();">
         <!-- <form class="main-form" action="" method="post" onsubmit="event.preventDefault();"> -->
@@ -264,7 +284,7 @@
 
 
 
-    <div class="ns_vidget">
+    <!-- <div class="ns_vidget">
         <form class="ns_vidget_form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
             <input type="hidden" name="action" value="nova_step_vidget_hook">
             <div class="ns_row ns_row-1">
@@ -302,7 +322,7 @@
                 <button class="ns_submit-btn" type="submit">Заказать уборку</button>
             </div>       
         </form>
-    </div>
+    </div> -->
 
 
 
@@ -345,7 +365,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.26.2/slimselect.min.css" rel="stylesheet"></link>
 
 <script>
-    let slim = new SlimSelect({
+    window.slim = new SlimSelect({
         select: '.ns_time__input',
         data: [
             {'placeholder': true, 'text': '00:00'},
@@ -367,4 +387,10 @@
         showSearch: false,
         // addToBody: true,
     });
+    window.slim.disable();
+</script>
+
+<script>
+    window.ajaxURL = '<?php echo admin_url('admin-ajax.php') ?>';
+    window.blockedTimeAndDates = JSON.parse('<?php echo json_encode(get_option('wporg_dates_option')); ?>');
 </script>

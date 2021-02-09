@@ -498,13 +498,14 @@ fieldset {
 }
 
 .ns_vidget {
-    position: absolute;
+    /* position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 1; */
     
     display: flex;
     justify-content: center;
+    margin-top: 10px;
     
 }
 
@@ -619,7 +620,7 @@ fieldset {
 }
 
 .ns_tel-input {
-    width: 150px !important;
+    width: 170px !important;
     margin-bottom: 0 !important;
     padding: 2px !important;
 
@@ -638,6 +639,11 @@ fieldset {
 
     font-family: "Overpass", Arial, Tahoma, sans-serif !important;
     font-size: 15px !important;
+}
+
+.ss-disabled {
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 }
 
 @media (max-width: 767px) {

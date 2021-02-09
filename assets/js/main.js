@@ -1,7 +1,6 @@
 const OPENING_HOUR = 9;
 const CLOSING_HOUR = 21;
 
-// window.addEventListener("load", function() {
 document.addEventListener("DOMContentLoaded", function() {
     // Тип уборки
 
@@ -73,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
     t_date[0].disable();
     
     let t_time = tippy('.ns_time', {
-        content: 'Выберите время между 9:00 и 18:00',
+        content: 'Выберите время между 9:00 и 21:00',
         placement: 'bottom',
         theme: 'tomato',
         trigger: 'manual',
@@ -136,7 +135,6 @@ document.addEventListener("DOMContentLoaded", function() {
     totalPriceInput.value = +totalPrice;
 
     function recalculateTotal() {
-        // ДОБАВИТЬ ДОП. УСЛУГИ
         totalPrice = sqPrice * sqMetersInput.value + +getCheckedPrice('clean-type') + +sumOfAddServices;
         totalPriceInput.value = +totalPrice;
         orderPrice.textContent = totalPrice + ' ₽';
@@ -197,17 +195,88 @@ document.addEventListener("DOMContentLoaded", function() {
     let activeStep = 0;
 
 
-    // dateInput.datepicker();
     let curDate = new Date();
 
     function dateToString(date) {
-        let day = date.getDate().toString.length == 1 ? '0' + date.getDate() : date.getDate();
-        let month = date.getMonth().toString.length == 1 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+        let day = date.getDate().toString().length == 1 ? '0' + date.getDate() : date.getDate();
+        let month = date.getMonth().toString().length == 1 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
         let year = date.getFullYear();
         return (day + '.' + month + '.' + year);
     }
 
+
+    // let blockedTimeAndDates = {
+    //     '28.02.2021': [
+    //         '9:00',
+    //         '10:00',
+    //         '11:00',
+    //         '12:00',
+    //         '13:00',
+    //         '14:00',
+    //         '15:00',
+    //         '16:00',
+    //         '17:00',
+    //         '18:00',
+    //         '19:00',
+    //         '20:00',
+    //         '21:00',        
+    //     ],
+    //     '27.02.2021': [
+    //         '9:00',
+    //         '10:00',
+    //         '11:00',
+    //         '12:00',
+    //         '13:00',
+    //         '14:00',
+    //         '15:00',
+    //         '16:00',
+    //         '17:00',
+    //         '18:00',
+    //         '19:00',
+    //         '20:00',
+    //         '21:00',        
+    //     ],
+    //     '21.02.2021': [
+    //         '9:00',
+    //         '17:00',
+    //         '18:00',
+    //         '19:00',
+    //         '21:00',        
+    //     ],
+    // };
+    let blockedDates = [];
+    let currentDate;
+
+    function checkDates() {
+        jQuery(function($){
+            $.ajax({
+                type: "GET",
+                url: window.ajaxURL,
+                data: {
+                    action : 'check_dates'
+                },
+                success: function (response) {
+                    console.log('AJAX response : ', response);
+                }
+            });
+        });
+    }
+
+    function getBlockedDates() {
+        for(let b in window.blockedTimeAndDates) {
+            if (window.blockedTimeAndDates[b].length === 13) {
+                blockedDates.push(b);
+            }
+        }
+    }
+
+    getBlockedDates()
+
     $('.date-input').datepicker({
+        onShow: function(inst, animationCompleted) {
+            if(!animationCompleted)
+                checkDates();
+        },
         onHide: function(inst, animationCompleted) {
             if(animationCompleted) {
                 let year = inst.el.value.substring(6,10);
@@ -233,30 +302,40 @@ document.addEventListener("DOMContentLoaded", function() {
                 dateStr = day + '.' + month + '.' + year;
             dateAndTime = dateStr + ' ' + timeStr;
             orderDate.textContent = dateAndTime;
+            if (dateStr !== '') {
+                currentDate = dateStr;
+                window.slim.enable();
+                window.slim.set();
+            }
             
         },
         onRenderCell: function (date, cellType) {
-            // var dateR = new Date();
-            // let day = curDate.getDate().toString.length == 1 ? '0' + curDate.getDate() : curDate.getDate();
-            // let month = curDate.getMonth().toString.length == 1 ? '0' + (curDate.getMonth() + 1) : curDate.getMonth() + 1;
-            // let year = curDate.getFullYear();
-            // let curD = day + '.' + month + '.' + year;
-
-            // console.log(dateToString(curDate));
+            if ((cellType == 'day' && date.getTime() < curDate.getTime()) || (cellType == 'day' && isBlockedDate(date))) {
+                console.log("blocked date: " + dateToString(date));
+                return {
+                    disabled: true
+                }
+            }
+            
             if (cellType == 'day' && dateToString(curDate) === dateToString(date)) {
                 return {
                     disabled: false
                 }
             }
-            // let cellDay = date.getTime();
-            if (cellType == 'day' && date.getTime() < curDate.getTime()) {    
-                return {
-                    disabled: true
-                }
-            }
         }
     }
     );
+
+    function isBlockedDate(date){
+        let dStr = dateToString(date);
+
+        for(let i = 0; i < blockedDates.length; i++) {
+            if (dStr === blockedDates[i]) {
+                console.log("return true!");
+                return true;
+            }
+        }
+    }
 
     nextBtn.addEventListener("click", nextButtonClick);
     nextBtnBottom.addEventListener("click", nextButtonClick);
@@ -278,18 +357,6 @@ document.addEventListener("DOMContentLoaded", function() {
             form.submit();
 
         } else if(evt.target.classList.contains ('dop-uslugi')) {
-            // evt.target.classList.remove('dop-uslugi');
-            // evt.target.classList.add('end');
-            // prevBtn.classList.remove('dop-uslugi');
-            // prevBtn.classList.add('end');
-            // prevBtnBottom.classList.remove('dop-uslugi');
-            // prevBtnBottom.classList.add('end');
-            // evt.target.innerHTML = 'Заказать';
-
-            // mainHeading.innerHTML = 'Расскажите о себе';
-            // secondStep.classList.add('hidden');
-            // thirdStep.classList.remove('hidden');
-
             changeActiveStep(3);
             changeActiveNum(3);
         } else {
@@ -332,15 +399,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 t_time[0].show();
                 return;
             }    
-            // mainHeading.innerHTML = 'Дополнительные услуги';
-            // firstStep.classList.add('hidden');
-            // secondStep.classList.remove('hidden');
-            // prevBtn.classList.remove('hidden');
-            // prevBtn.classList.add('dop-uslugi');
-            // prevBtnBottom.classList.remove('hidden');
-            // prevBtnBottom.classList.add('dop-uslugi');
-            // evt.target.classList.add('dop-uslugi');
-
             changeActiveStep(2);
             changeActiveNum(2);
         }      
@@ -511,18 +569,14 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             else {
                 checkBox.checked = true;
-                // orderServiceList.appendChild(document.createElement("li").textContent = closestItem.querySelector('.service-name').textContent);
                 var li = document.createElement("li");
                 li.setAttribute('class', 'order-service-item');
                 li.setAttribute('data-index', checkBox.value);
                 li.appendChild(document.createTextNode(closestItem.querySelector('.service-name').textContent));
                 orderServiceList.appendChild(li);
                 sumOfAddServices += +checkBox.dataset.servicePrice;
-                // orderServiceList.textContent = closestItem.querySelector('.service-name').textContent
-                
             }
             recalculateTotal()
-            // console.log('checkbox ' + checkBox.checked);
         }
         
     });
@@ -557,7 +611,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if(evt.target.value <= 0) {
             evt.target.value = 1;
 
-            // sqMetersInput.value = evt.target.value; // Вынести в ф-цию
             updateOriginSq(evt.target.value);
             if (evt.target.id === 'sqm-dup-mobile') {
                 t_mobileInputDisplay[0].enable();
@@ -569,9 +622,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         else {
             updateOriginSq(evt.target.value);
-            // sqMetersInput.value = evt.target.value;  // Вынести в ф-цию
-            // let event = new Event('change');    // Вынести в ф-цию
-            // sqMetersInput.dispatchEvent(event); // Вынести в ф-цию
         }
     }
 
@@ -596,13 +646,11 @@ document.addEventListener("DOMContentLoaded", function() {
             if(sqD.value <= 1) return;
             sqD.value = +sqD.value - 1;
 
-            // sqMetersInput.value = sqD.value; // Вынести в ф-цию
             updateOriginSq(sqD.value);
         }
         else if(evt.target.classList.contains('input-num__button_plus')) {
             sqD.value = +sqD.value + 1;
 
-            // sqMetersInput.value = sqD.value; // Вынести в ф-цию
             updateOriginSq(sqD.value);
         }
         recalculateTotal();
@@ -622,10 +670,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     cleanTypeList.forEach(el => {
         el.addEventListener('change', function(evt) {
-            // console.log(evt.target);
-            // evt.target.parentNode.querySelector('.clean-title').textContent
-            // console.log(evt.target.parentNode.querySelector('.clean-title').textContent);
-            
             if (evt.target.checked) {
                 typeOrder.textContent = evt.target.parentNode.querySelector('.clean-title').textContent;
             }
@@ -633,7 +677,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Адрес
-
     let orderAddr = document.querySelector('.order-address');
     
     let streetStr = '';
@@ -642,11 +685,9 @@ document.addEventListener("DOMContentLoaded", function() {
     let addressResult = '';
 
     streetInput.addEventListener('change', function(evt) {
-        // console.log(evt.target.value);
         streetStr = evt.target.value;
         addressResult = streetStr + houseStr + apartmentStr;
         orderAddr.textContent = addressResult; 
-        // if(evt.target.value != "")
     });
     streetInput.addEventListener('focusout', function(evt) {
         streetStr = evt.target.value;
@@ -656,11 +697,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     houseInput.addEventListener('change', function(evt) {
-        // console.log(evt.target.value);
         houseStr = evt.target.value == '' ? '' : ', ' + evt.target.value;
         addressResult = streetStr + houseStr + apartmentStr;
         orderAddr.textContent = addressResult; 
-        // if(evt.target.value != "")
     });
     houseInput.addEventListener('mouseleave', function(evt) {
         houseStr = evt.target.value == '' ? '' : ', ' + evt.target.value;
@@ -670,11 +709,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     apartmentInput.addEventListener('change', function(evt) {
-        // console.log(evt.target.value);
         apartmentStr = evt.target.value == '' ? '' : ', кв. ' + evt.target.value;
         addressResult = streetStr + houseStr + apartmentStr;
         orderAddr.textContent = addressResult; 
-        // if(evt.target.value != "")
     });
     apartmentInput.addEventListener('mouseleave', function(evt) {
         apartmentStr = evt.target.value == '' ? '' : ', кв. ' + evt.target.value;
@@ -684,25 +721,12 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Дата и время
 
-    // let dateInput =  document.querySelector(".date-input");
     let orderDate = document.querySelector('.order-date');
     let dateStr = '';
     let timeStr = '';
     let dateAndTime = '';
 
-    // dateInput.addEventListener('change', function(evt){
-    //     let year = evt.target.value.substring(0,4);
-    //     let month = evt.target.value.substring(5,7);
-    //     let day = evt.target.value.substring(8,10);
-    //     console.log('DATE: ' + +year);
-
-    //     dateStr = day + '.' + month + '.' + year;
-    //     dateAndTime = dateStr + ' ' + timeStr;
-    //     orderDate.textContent = dateAndTime;
-    // });
-
     timeInput.addEventListener('change', function(evt){
-        // console.log(evt.target.value);
         timeStr = evt.target.value;
         if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
             t_time[0].enable();
@@ -710,11 +734,14 @@ document.addEventListener("DOMContentLoaded", function() {
             evt.target.value = '';
             return;
         }
+        if (timeStr == 'undefined') { 
+            timeStr = '';
+        }
         dateAndTime = dateStr + ' ' + timeStr;
         orderDate.textContent = dateAndTime;
     });
+
     timeInput.addEventListener('input', function(evt){
-        // console.log(evt.target.value);
         timeStr = evt.target.value;
         if(timeStr.substring(0, 2) > CLOSING_HOUR || timeStr.substring(0, 2) < OPENING_HOUR) {
             t_time[0].enable();
@@ -722,12 +749,53 @@ document.addEventListener("DOMContentLoaded", function() {
             evt.target.value = '';
             return;
         }
+        if (timeStr == 'undefined') { 
+            timeStr = '';
+        }
         dateAndTime = dateStr + ' ' + timeStr;
         orderDate.textContent = dateAndTime;
     });
+    
+    // Выбираем целевой элемент
+    let target = document.querySelector('.ss-content');
+
+    // Конфигурация observer (за какими изменениями наблюдать)
+    const config = {
+        attributes: true,
+        attributeOldValue: true,
+    };
+
+    const ssList = document.querySelector('.ss-list').children;
+
+    const callback = function(mutationsList, observer) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                if(!mutation.oldValue.includes('ss-open')) {
+                    if (window.blockedTimeAndDates[currentDate] !== undefined) {
+                        for (let i=0, child; child = ssList[i]; i++) {
+                            for (let j = 0; j < window.blockedTimeAndDates[currentDate].length; j++) {
+                                if (child.innerHTML === window.blockedTimeAndDates[currentDate][j])
+                                    child.classList.add('ss-disabled');
+                            }
+                        }
+                    }
+                } else {
+                    for (let i=0, child; child = ssList[i]; i++) {
+                        if (!child.classList.contains('ss-option-selected'))
+                            child.classList.remove('ss-disabled');
+                    }
+                }
+            }
+        }
+    };
+
+    // Создаем экземпляр наблюдателя с указанной функцией обратного вызова
+    const observer = new MutationObserver(callback);
+
+    // Начинаем наблюдение за настроенными изменениями целевого элемента
+    observer.observe(target, config);
 
     
-
 
 
 

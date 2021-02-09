@@ -65,6 +65,14 @@ function nova_step_admin_settings_init() {
         'novastep_dopuslugi_section_callback',
         'novastep'
     );
+
+    // Секции и поля для забронированных дат
+    add_settings_section(
+        'novastep_reservation_section',
+        'Бронь',
+        'novastep_reservation_section_callback',
+        'novastep'
+    );
 }
 
 add_action('admin_init', 'nova_step_admin_settings_init');
@@ -105,6 +113,13 @@ function novastep_dopuslugi_section_callback() {
     echo '<button class="add-dopuslugu" type="button">Добавить доп. услугу</button>';
 }
 
+function novastep_reservation_section_callback() {
+    // echo '<div class="date-input"></div>';
+    // ob_start();
+    require('admin-calendar.php');
+    // return ob_get_clean();
+}
+
 function novastep_settings_sq_price_callback() {
     // get the value of the setting we've registered with register_setting()
     $setting = get_option('novastep_setting_name');
@@ -135,17 +150,18 @@ function nova_step_show_content() {
     require_once('adminview.php');
 }
 
-// function nova_step_admin_submit() {
-//     if('POST' === $_SERVER['REQUEST_METHOD']) {
-        
-//     }
-// }
-
 
 // Регистрация скриптов и стилей (админ)
 function nova_step_register_admin_assets() {
+    wp_deregister_script("jquery-ui-datepicker");
+
     wp_register_style('nova_step_admin-styles', plugins_url('assets/css/admin.css', __FILE__));
-    wp_register_script('nova_step_scripts', plugins_url('assets/js/admin.js', __FILE__), array('jquery'), null, true);
+    wp_register_script('nova_step_scripts', plugins_url('assets/js/admin.js', __FILE__), array(), null, true);
+
+    wp_register_style( 'AdminAirCSS', plugins_url('/air-datepicker/css/datepicker.css', __FILE__));
+    wp_enqueue_style( 'AdminAirCSS' );
+    wp_register_script( 'AdminAirJS', plugins_url('/air-datepicker/js/datepicker.js', __FILE__), null, null, true );
+    wp_enqueue_script('AdminAirJS');
 }
 add_action('admin_enqueue_scripts', 'nova_step_register_admin_assets');
 
@@ -153,7 +169,7 @@ add_action('admin_enqueue_scripts', 'nova_step_register_admin_assets');
 
 function nova_step_load_assets($hook) {
     if($hook != 'toplevel_page_novastep') {
-            return;
+        return;
     }
     wp_enqueue_style('nova_step_admin-styles');
     wp_enqueue_script('nova_step_scripts');
@@ -258,6 +274,58 @@ add_action( 'init', 'wporg_shortcodes_init' );
     add_action('admin_post_nova_step_hook', 'the_nova_action_hook_callback');
     add_action('admin_post_nopriv_nova_step_hook', 'the_nova_action_hook_callback');
     function the_nova_action_hook_callback() {
+        $date = $_POST['ns_date'];
+        $time = $_POST['ns_time'];
+
+        $blocked_dates = get_option('wporg_dates_option');
+        if ($blocked_dates != false) {
+            $curDate = date("d.m.Y");
+            $curYear = intval(substr($curDate, 6, 4));
+            $curMonth = intval(substr($curDate, 3, 2));
+            $curDay = intval(substr($curDate, 0, 2));
+
+            foreach ($blocked_dates as $key => $value) {
+                // 0123456789 = 10
+                // 00.00.0000
+                $year = intval(substr($key, 6, 4));
+                $month = intval(substr($key, 3, 2));
+                $day = intval(substr($key, 0, 2));
+                if ($year > $curYear) {
+                    continue;
+                }
+                if ($year < $curYear) {
+                    unset($blocked_dates[$key]);
+                    continue;
+                }
+                if ($month > $curMonth) {
+                    continue;
+                }
+                if ($month < $curMonth) {
+                    unset($blocked_dates[$key]);
+                    continue;
+                }
+                if ($day > $curDay) {
+                    continue;
+                }
+                if ($day < $curDay) {
+                    unset($blocked_dates[$key]);
+                }
+            }
+            
+            if (array_key_exists($date, $blocked_dates)) {
+                if (! in_array($time, $blocked_dates[$date])) {
+                    array_push($blocked_dates[$date], $time);
+                }
+            } else {
+                // $res = array($date => array($time));
+                $blocked_dates[$date] = array($time);
+                // array_push($blocked_dates, $res);
+            }
+        } else {
+            $blocked_dates = array($date => array($time));
+        }
+        update_option('wporg_dates_option', $blocked_dates);
+
         // status_header(200);
         $addServicesArray = [
             "1" => "Чистка вытяжки",
@@ -306,6 +374,25 @@ add_action( 'init', 'wporg_shortcodes_init' );
         wp_mail('meshcheryakovvrn@gmail.com', 'Заказ с сайта', $body, $headers);
         wp_redirect( get_site_url() . '/calc', 301 ); 
         exit;
+    }
+
+    add_action( 'wp_ajax_check_dates', 'check_dates_callback' );
+    add_action( 'wp_ajax_nopriv_check_dates', 'check_dates_callback' );
+    function check_dates_callback() {
+        $dates = get_option('wporg_dates_option');
+        echo json_encode($dates);
+    
+        // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+        wp_die();
+    }
+
+    add_action( 'wp_ajax_update_dates', 'update_dates_callback' );
+    function update_dates_callback() {
+        update_option('wporg_dates_option', $_POST['dates']);
+        echo json_encode($_POST['dates']);
+        // echo $_POST['dates'];
+
+        wp_die();
     }
 
  ?>
